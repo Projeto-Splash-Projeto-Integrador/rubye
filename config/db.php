@@ -1,0 +1,25 @@
+<?php
+// Garante que a sessão só é iniciada uma vez.
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Definições do Banco de Dados
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_NAME', 'rubye_db');
+
+// Criar a conexão
+$conexao = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
+
+// Checar a conexão
+if ($conexao->connect_error) {
+    // Escreve o erro num log em vez de o mostrar ao utilizador (mais seguro)
+    error_log("Falha na conexão com o MySQL: " . $conexao->connect_error);
+    // Mostra uma mensagem genérica
+    die("Ocorreu um erro de conexão. Por favor, tente mais tarde.");
+}
+
+// Definir o charset para UTF-8
+$conexao->set_charset("utf8mb4");
