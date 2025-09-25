@@ -26,7 +26,7 @@ CREATE TABLE `usuarios` (
   UNIQUE KEY `email_unico` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Tabela: produtos
+-- Tabela: produtos (VERSÃO ATUALIZADA)
 -- Armazena todos os produtos da loja.
 CREATE TABLE `produtos` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -36,6 +36,7 @@ CREATE TABLE `produtos` (
   `imagem` VARCHAR(255) NOT NULL, -- Caminho para o arquivo da imagem
   `estoque` INT NOT NULL DEFAULT 0,
   `categoria_id` INT,
+  `status` ENUM('ativo','inativo') NOT NULL DEFAULT 'ativo', -- Coluna para "apagar de forma lógica"
   PRIMARY KEY (`id`),
   KEY `fk_categoria` (`categoria_id`),
   CONSTRAINT `fk_produtos_categorias` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -70,7 +71,7 @@ CREATE TABLE `pedido_itens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Inserindo um usuário administrador padrão para testes
--- Senha: "admin123" (o hash gerado é para esta senha)
+-- A senha é "admin123"
 INSERT INTO `usuarios` (`nome`, `email`, `senha`, `role`) VALUES
 ('Admin', 'admin@rubye.com', '$2y$10$3h.U8B2jYJd/R0yEwLJGVeEplqjD1/uNIX/BEPIhzuFkF6Jb85f/.', 'admin');
 
