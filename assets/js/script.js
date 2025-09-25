@@ -37,3 +37,26 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+// Dentro de /assets/js/script.js
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // --- CÓDIGO EXISTENTE DE ADICIONAR AO CARRINHO ---
+    const addToCartForms = document.querySelectorAll('.form-add-to-cart');
+    // ... (mantenha todo o código do carrinho aqui)
+
+
+    // --- ADICIONE O CÓDIGO NOVO DO CARROSSEL AQUI ---
+    // Verifica se existe um elemento com a classe .splide na página
+    if (document.querySelector('.splide')) {
+        new Splide('.splide', {
+            type       : 'loop',      // Faz o carrossel voltar ao início
+            autoplay   : true,        // Inicia o carrossel automaticamente
+            interval   : 4000,        // Muda de imagem a cada 4 segundos
+            pagination : true,        // Mostra os pontinhos de navegação
+            arrows     : false,       // Esconde as setas laterais
+            height     : '80vh',      // Define a altura do carrossel
+            cover      : true,        // Faz as imagens cobrirem todo o espaço do slide
+        }).mount();
+    }
+});
