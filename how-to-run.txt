@@ -107,3 +107,96 @@
    Agora, o seu site será acedido através de http://localhost:8080/RUBYE/public/
 */
 ?>
+
+
+<?php
+/*
+==================================================================
+ GUIA RÁPIDO: Como Executar o Projeto RUBYE num Novo Ambiente
+==================================================================
+
+ Olá! Este guia serve para quando você levar o seu projeto para outro
+ computador ou servidor onde as configurações do banco de dados 
+ (especialmente a senha) são diferentes.
+
+ Atentando-se a estes pontos, a chance de passar raiva é quase zero.
+*/
+
+/*
+==================================================================
+ Ponto de Atenção nº 1 (O Mais Importante): O Ficheiro de Configuração
+==================================================================
+
+ Todo o segredo para a ligação com o banco de dados está num único ficheiro.
+
+ 1.1. LOCALIZAÇÃO DO FICHEIRO:
+    - Vá para a pasta do seu projeto e encontre: /config/db.php
+
+ 1.2. O QUE EDITAR:
+    - Abra o ficheiro db.php. Dentro dele, você encontrará estas linhas:
+
+        define('DB_SERVER', 'localhost');
+        define('DB_USERNAME', 'root');
+        define('DB_PASSWORD', ''); // <-- AQUI ESTÁ O PONTO CRÍTICO!
+        define('DB_NAME', 'rubye_db');
+
+    - Altere os valores conforme necessário para o novo ambiente:
+      - DB_SERVER: Geralmente continua 'localhost', a não ser que o banco de dados esteja noutra máquina.
+      - DB_USERNAME: Se o nome de utilizador do seu novo MySQL não for 'root', altere aqui.
+      - DB_PASSWORD: Se o seu novo MySQL tiver uma senha, coloque-a aqui entre as aspas. Por exemplo: '1234'.
+      - DB_NAME: Se você deu um nome diferente ao seu banco de dados, altere aqui.
+
+    - Exemplo para um ambiente com senha 'nova_senha_123':
+        define('DB_PASSWORD', 'nova_senha_123');
+*/
+
+/*
+==================================================================
+ Ponto de Atenção nº 2: O Banco de Dados no Novo Local
+==================================================================
+
+ Lembre-se que, num novo computador, o banco de dados não existe magicamente.
+
+ 2.1. CRIAR O BANCO DE DADOS:
+    - No novo ambiente, aceda ao phpMyAdmin.
+    - Crie um novo banco de dados com o nome exato que está no seu ficheiro
+      db.php (por padrão, 'rubye_db').
+
+ 2.2. IMPORTAR AS TABELAS:
+    - Selecione o banco de dados que acabou de criar.
+    - Use a aba "Import" (Importar) para carregar o seu ficheiro .sql
+      com a estrutura de todas as tabelas e os dados iniciais.
+*/
+
+/*
+==================================================================
+ Ponto de Atenção nº 3 (Opcional): Acesso ao phpMyAdmin
+==================================================================
+
+ Lembra-se do problema que tivemos onde o phpMyAdmin ficou trancado?
+ Se no novo ambiente você definir uma senha para o utilizador 'root',
+ isso pode acontecer de novo.
+
+ 3.1. O FICHEIRO DE CONFIGURAÇÃO DO PHPMYADMIN:
+    - O ficheiro fica geralmente em: C:\xampp\phpMyAdmin\config.inc.php
+
+ 3.2. O QUE FAZER:
+    - Se o phpMyAdmin der erro de "Access Denied", abra o ficheiro acima.
+    - Procure a linha `$cfg['Servers'][$i]['password'] = '';`
+    - Coloque a nova senha do 'root' entre as aspas.
+*/
+
+/*
+==================================================================
+ CHECKLIST RÁPIDO PARA NÃO PASSAR RAIVA:
+==================================================================
+
+ [ ] Os serviços Apache e MySQL do XAMPP estão a funcionar?
+ [ ] A pasta do projeto RUBYE está dentro da pasta 'htdocs'?
+ [ ] O banco de dados 'rubye_db' foi criado no novo phpMyAdmin?
+ [ ] As tabelas foram importadas através do ficheiro .sql?
+ [ ] O ficheiro /config/db.php foi atualizado com o NOME DE UTILIZADOR e a SENHA corretos do NOVO ambiente?
+
+ Se você verificar estes cinco pontos, o seu site irá funcionar em qualquer lugar.
+*/
+?>
