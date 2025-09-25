@@ -1,4 +1,4 @@
-/* === TEMA CLARO MINIMALISTA - ESTILO RUBYE (VERSÃO FINAL) === */
+
 
 :root {
     --background-color: #ffffff;
@@ -8,12 +8,19 @@
     --font-body: 'Work Sans', sans-serif;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: var(--font-body);
     margin: 0;
     background-color: var(--background-color);
     color: var(--text-color);
     font-weight: 400;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 a {
@@ -40,6 +47,8 @@ a {
 /* === CONTEÚDO PRINCIPAL === */
 .site-main {
     padding: 0;
+    flex-grow: 1;
+
 }
 
 /* === CARROSSEL (MELHORADO) === */
@@ -389,4 +398,241 @@ a {
 .summary-actions {
     margin-top: 30px; /* Aumenta o espaço ACIMA do botão */
     gap: 20px;         /* Aumenta o espaço ABAIXO do botão (entre ele e o link) */
+}
+
+/*
+============================================================
+=== ESTILIZAÇÃO ESPECÍFICA PARA MINHA CONTA (minha_conta.php) ===
+============================================================
+*/
+
+.account-page {
+    max-width: 900px; /* Limita a largura para melhor legibilidade */
+    margin: 40px auto; /* Centraliza a caixa de conteúdo */
+    padding: 0;
+}
+
+.account-page h2 {
+    font-size: 1.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.account-page h3 {
+    text-align: center;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 40px;
+}
+
+/* Estilo para a mensagem de sucesso do pedido */
+.account-page .success {
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    padding: 15px;
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.order-history h4 {
+    font-size: 1.2em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+}
+
+.order-history table {
+    border: none;
+}
+
+.order-history table th {
+    background: none;
+    text-align: left;
+    padding: 15px 10px;
+}
+
+.order-history table td {
+    border-top: 1px solid var(--border-color);
+    padding: 20px 10px;
+}
+
+.order-history table tr:hover {
+    background-color: #f9f9f9;
+}
+
+/*
+============================================================
+=== ESTILIZAÇÃO PARA LOGIN, REGISTRO E MINHA CONTA ===
+============================================================
+*/
+
+/* --- Estilo para o Botão de Logout em minha_conta.php --- */
+.account-actions {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid var(--border-color);
+}
+.btn-secondary {
+    background-color: #666;
+    color: #fff;
+    padding: 10px 25px;
+    text-transform: uppercase;
+    font-size: 0.9em;
+    font-weight: 700;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+.btn-secondary:hover {
+    background-color: #444;
+}
+
+
+/* --- Estilo para as Telas de Login e Registro --- */
+.login-container {
+    max-width: 450px;
+    margin: 60px auto;
+    padding: 50px;
+    border: 1px solid var(--border-color);
+    background: #fff;
+}
+.login-container h2 {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-top: 0;
+    margin-bottom: 30px;
+}
+.login-container label {
+    font-size: 0.9em;
+    color: #555;
+}
+.login-container input[type="text"],
+.login-container input[type="email"],
+.login-container input[type="password"] {
+    width: 100%;                  /* ADICIONE ESTA LINHA */
+    box-sizing: border-box;       /* ADICIONE ESTA LINHA */
+    margin-bottom: 20px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border: 1px solid var(--border-color);
+}
+.login-container button {
+    width: 100%;
+    padding: 15px;
+    background-color: var(--text-color);
+    color: var(--background-color);
+    border: 1px solid var(--text-color);
+    margin-top: 10px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.login-container button:hover {
+    background-color: #333;
+}
+.login-container p {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 0.9em;
+    color: #555;
+}
+/* --- Correção de Alinhamento para Formulários de Login/Registro --- */
+.login-container label {
+    display: flex;       /* Força a etiqueta a ocupar a sua própria linha */
+    text-align: left;     /* Alinha o texto da etiqueta à esquerda */
+    margin-bottom: 8px;   /* Adiciona um pequeno espaço entre a etiqueta e o campo de texto */
+    font-size: 0.9em;
+    color: #555;
+    font-weight: 500;
+}
+.login-container .error {
+    background-color: #ffebee;
+    border: 1px solid #e57373;
+    color: #c62828;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/*
+============================================================
+=== ESTILIZAÇÃO PARA O DASHBOARD DO ADMIN (index.php) ===
+============================================================
+*/
+
+.dashboard-page {
+    max-width: 1200px;
+    margin: 40px auto;
+}
+
+.dashboard-page h2 {
+    font-size: 1.8em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.dashboard-page p {
+    text-align: center;
+    color: #555;
+    margin-bottom: 50px;
+}
+
+.dashboard-grid {
+    display: grid;
+    /* Cria 4 colunas em ecrãs grandes, 2 em médios e 1 em pequenos */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.dashboard-grid .card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.dashboard-grid .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.dashboard-grid .card h3 {
+    margin-top: 0;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 1px;
+}
+
+.dashboard-grid .card .stat {
+    font-size: 3em;
+    font-weight: 700;
+    color: var(--text-color);
+    margin: 15px 0;
+}
+
+.dashboard-grid .card a {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 15px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+.dashboard-grid .card a:hover {
+    background-color: #ddd;
 }

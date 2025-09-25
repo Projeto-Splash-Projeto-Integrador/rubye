@@ -22,7 +22,7 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     <header class="admin-header">
         <h1>Painel Administrativo RUBYE</h1>
         <nav>
-            <a href="index.php">Dashboard</a>
+            <a href="index.php">Minha Conta</a>
             <a href="gerenciar_produtos.php">Produtos</a>
             <a href="gerenciar_categorias.php">Categorias</a>
             <a href="ver_pedidos.php">Pedidos</a>

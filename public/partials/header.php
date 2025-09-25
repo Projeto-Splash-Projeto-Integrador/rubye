@@ -10,7 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=Work+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body>
@@ -34,7 +35,16 @@
                     <i class="fa-solid fa-cart-shopping"></i>
                     (<span id="cart-counter"><?php echo isset($_SESSION['carrinho']) ? count($_SESSION['carrinho']) : 0; ?></span>)
                 </a>
-                <a href="minha_conta.php"><i class="fa-solid fa-user"></i></a>
+
+                <?php // --- AQUI ESTÁ A LÓGICA DE LOGIN/LOGOUT ---
+                if (isset($_SESSION['usuario_id'])) : ?>
+                    <a href="minha_conta.php"><i class="fa-solid fa-user"></i></a>
+                    <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i></a>
+                <?php else : ?>
+                    <a href="login.php">Login</a>
+                    <a href="registro.php">Registrar</a>
+                <?php endif; ?>
+                
             </div>
         </div>
     </header>
