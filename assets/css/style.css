@@ -45,7 +45,7 @@ a {
 .header-icons a { font-size: 1.2em; margin-left: 15px; }
 
 /* === CONTEÚDO PRINCIPAL === */
-.site-main {
+.site-main,.admin-container {
     padding: 0;
     flex-grow: 1;
 
