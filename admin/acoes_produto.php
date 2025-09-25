@@ -85,20 +85,15 @@ if (isset($_GET['acao'])) {
     elseif ($acao == 'excluir' && isset($_GET['id'])) {
         $id = $_GET['id'];
 
-        // Opcional: Excluir o arquivo de imagem do servidor para economizar espaço
-        $stmt_select = $conexao->prepare("SELECT imagem FROM produtos WHERE id = ?");
-        $stmt_select->bind_param("i", $id);
-        $stmt_select->execute();
-        $resultado = $stmt_select->get_result()->fetch_assoc();
-        if ($resultado && $resultado['imagem'] != 'default.jpg' && file_exists('../assets/uploads/' . $resultado['imagem'])) {
-            unlink('../assets/uploads/' . $resultado['imagem']);
-        }
-        
-        // Excluir do banco
-        $stmt = $conexao->prepare("DELETE FROM produtos WHERE id = ?");
+        // Em vez de apagar, mudamos o status para 'inativo'
+        $stmt = $conexao->prepare("UPDATE produtos SET status = 'inativo' WHERE id = ?");
         $stmt->bind_param("i", $id);
-        $stmt->execute();
-        header("Location: gerenciar_produtos.php?sucesso=3");
+        
+        if ($stmt->execute()) {
+            header("Location: gerenciar_produtos.php?sucesso=3");
+        } else {
+            header("Location: gerenciar_produtos.php?erro=3");
+        }
     }
 }
 

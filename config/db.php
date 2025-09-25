@@ -23,3 +23,5 @@ if ($conexao->connect_error) {
 
 // Definir o charset para UTF-8
 $conexao->set_charset("utf8mb4");
+
+// A chave '}' extra que estava aqui foi removida.

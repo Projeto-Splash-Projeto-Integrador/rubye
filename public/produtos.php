@@ -19,17 +19,17 @@
         <h2>Nossos Produtos</h2>
         <div class="product-grid">
             <?php
-            // Monta a query SQL base
-            $sql = "SELECT * FROM produtos";
-
-            // Se um filtro de categoria foi aplicado via URL, adiciona a condição WHERE
+            // Se um filtro de categoria foi aplicado via URL
             if (isset($_GET['categoria']) && is_numeric($_GET['categoria'])) {
                 $categoria_id = $_GET['categoria'];
-                // Usamos prepared statements para segurança
-                $stmt = $conexao->prepare($sql . " WHERE categoria_id = ? ORDER BY nome ASC");
+                
+                // AQUI ESTÁ A CORREÇÃO: Adicionamos "AND status = 'ativo'"
+                $stmt = $conexao->prepare("SELECT * FROM produtos WHERE categoria_id = ? AND status = 'ativo' ORDER BY nome ASC");
                 $stmt->bind_param("i", $categoria_id);
             } else {
-                $stmt = $conexao->prepare($sql . " ORDER BY nome ASC");
+                // Se não houver filtro, busca todos os produtos ATIVOS
+                // AQUI ESTÁ A CORREÇÃO: Adicionamos "WHERE status = 'ativo'"
+                $stmt = $conexao->prepare("SELECT * FROM produtos WHERE status = 'ativo' ORDER BY nome ASC");
             }
 
             $stmt->execute();
@@ -40,7 +40,9 @@
             ?>
                     <div class="product-card">
                         <a href="produto.php?id=<?php echo $produto['id']; ?>">
-                            <img src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+                            <div class="product-image-container">
+                                <img src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+                            </div>
                             <h4><?php echo htmlspecialchars($produto['nome']); ?></h4>
                             <p class="price">R$ <?php echo number_format($produto['preco'], 2, ',', '.'); ?></p>
                         </a>
@@ -48,7 +50,7 @@
             <?php 
                 }
             } else {
-                echo "<p>Nenhum produto encontrado nesta categoria.</p>";
+                echo "<p>Nenhum produto encontrado.</p>";
             }
             ?>
         </div>

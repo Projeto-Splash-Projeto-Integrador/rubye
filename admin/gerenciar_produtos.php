@@ -35,7 +35,7 @@
 </div>
 
 <div class="table-container">
-    <h3>Produtos Cadastrados</h3>
+    <h3>Produtos Cadastrados (Ativos)</h3>
     <table>
         <thead>
             <tr>
@@ -49,7 +49,8 @@
         </thead>
         <tbody>
             <?php
-            $sql = "SELECT * FROM produtos ORDER BY id DESC";
+            // AQUI ESTÁ A CORREÇÃO: Adicionamos "WHERE status = 'ativo'" à consulta
+            $sql = "SELECT * FROM produtos WHERE status = 'ativo' ORDER BY id DESC";
             $produtos = $conexao->query($sql);
             while ($produto = $produtos->fetch_assoc()) {
             ?>
@@ -61,7 +62,7 @@
                     <td><?php echo $produto['estoque']; ?></td>
                     <td>
                         <a href="editar_produto.php?id=<?php echo $produto['id']; ?>">Editar</a>
-                        <a href="acoes_produto.php?acao=excluir&id=<?php echo $produto['id']; ?>" onclick="return confirm('Tem certeza?');">Excluir</a>
+                        <a href="acoes_produto.php?acao=excluir&id=<?php echo $produto['id']; ?>" onclick="return confirm('Tem certeza que deseja desativar este produto?');">Desativar</a>
                     </td>
                 </tr>
             <?php } ?>

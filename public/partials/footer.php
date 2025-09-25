@@ -2,6 +2,8 @@
         <p>&copy; <?php echo date('Y'); ?> RUBYE Store. Todos os direitos reservados.</p>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+
     <script src="../assets/js/script.js"></script>
 </body>
 </html>
