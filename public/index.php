@@ -7,21 +7,21 @@
                 <img src="../assets/img/2.webp" alt="Coleção de Inverno">
                 <div class="slide-content">
                     <h2>Nova Coleção</h2>
-                    <a href="produtos.php" class="btn-slide">Comprar Agora</a>
+                    <a href="colecoes.php" class="btn-slide">Comprar Agora</a>
                 </div>
             </li>
             <li class="splide__slide">
                 <img src="../assets/img/3.webp" alt="Acessórios Exclusivos">
                 <div class="slide-content">
                     <h2>Acessórios</h2>
-                    <a href="produtos.php" class="btn-slide">Descobrir</a>
+                    <a href="produtos.php?categoria=3" class="btn-slide">Descobrir</a>
                 </div>
             </li>
             <li class="splide__slide">
                 <img src="../assets/img/1.jpg" alt="Estilo Urbano">
                 <div class="slide-content">
                     <h2>Estilo Urbano</h2>
-                    <a href="produtos.php" class="btn-slide">Ver Coleção</a>
+                    <a href="produtos.php?colecao=2" class="btn-slide">Ver Coleção</a>
                 </div>
             </li>
         </ul>
