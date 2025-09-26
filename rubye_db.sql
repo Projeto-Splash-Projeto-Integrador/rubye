@@ -1,12 +1,9 @@
-
-CREATE DATABASE rubye_db;
-
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 26/09/2025 às 14:53
+-- Tempo de geração: 26/09/2025 às 21:26
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.0.30
 
@@ -62,8 +59,8 @@ CREATE TABLE `colecoes` (
 --
 
 INSERT INTO `colecoes` (`id`, `nome`, `imagem`) VALUES
-(1, 'Outono', 'col_68d60d96b0a4d.png'),
-(2, 'Primavera', 'col_68d61946e0e08.jpg');
+(1, 'Outono', 'col_68d68f8e0d172.jpeg'),
+(2, 'Primavera', 'col_68d68fa956344.jpeg');
 
 -- --------------------------------------------------------
 
@@ -88,7 +85,8 @@ INSERT INTO `pedidos` (`id`, `usuario_id`, `total`, `status`, `data_pedido`) VAL
 (2, 1, 100.00, 'Entregue', '2025-09-25 03:57:33'),
 (3, 1, 200.00, 'Entregue', '2025-09-26 03:02:43'),
 (4, 4, 2000.00, 'Entregue', '2025-09-26 04:28:00'),
-(5, 1, 259.99, 'Pagamento Confirmado', '2025-09-26 12:30:04');
+(5, 1, 259.99, 'Entregue', '2025-09-26 12:30:04'),
+(6, 1, 379.98, 'Entregue', '2025-09-26 16:43:27');
 
 -- --------------------------------------------------------
 
@@ -113,7 +111,8 @@ INSERT INTO `pedido_itens` (`id`, `pedido_id`, `produto_id`, `quantidade`, `prec
 (2, 2, 4, 1, 100.00),
 (3, 3, 8, 2, 100.00),
 (4, 4, 9, 2, 1000.00),
-(5, 5, 11, 1, 259.99);
+(5, 5, 11, 1, 259.99),
+(6, 6, 2, 2, 189.99);
 
 -- --------------------------------------------------------
 
@@ -137,7 +136,7 @@ CREATE TABLE `produtos` (
 --
 
 INSERT INTO `produtos` (`id`, `nome`, `descricao`, `preco`, `imagem`, `estoque`, `categoria_id`, `status`) VALUES
-(2, 'Calça CLASS PRETA', 'sabao', 189.99, '68d68af11636b.webp', 50, 2, 'ativo'),
+(2, 'Calça CLASS PRETA', 'sabao', 189.99, '68d68af11636b.webp', 48, 2, 'ativo'),
 (3, 'Calça PACE VELUDO', 'teste', 209.99, '68d68ab273a45.webp', 50, 2, 'ativo'),
 (4, 'Shorts CLASS', 'sabao', 149.99, '68d68a76956d1.webp', 25, 2, 'ativo'),
 (5, 'Calça PIET JEANS', 'ASDASDASD', 189.99, '68d68a25aec64.webp', 50, 1, 'ativo'),
@@ -312,13 +311,13 @@ ALTER TABLE `colecoes`
 -- AUTO_INCREMENT de tabela `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `pedido_itens`
 --
 ALTER TABLE `pedido_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `produtos`
