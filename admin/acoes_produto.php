@@ -6,96 +6,211 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     die("Acesso negado.");
 }
 
+// Garante que a mensagem de alerta de uma ação anterior seja limpa
+unset($_SESSION['bulk_alert_message']);
+
 // Verifica se uma ação foi definida via GET
 if (isset($_GET['acao'])) {
     $acao = $_GET['acao'];
 
-    // --- AÇÃO: ADICIONAR PRODUTO ---
-    if ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
-        // Coleta de dados do formulário
-        $nome = $_POST['nome'];
-        $descricao = $_POST['descricao'];
-        $preco = str_replace(',', '.', $_POST['preco']); // Converte vírgula para ponto
-        $estoque = $_POST['estoque'];
-        $categoria_id = $_POST['categoria_id'];
+    // --- AÇÃO: ATUALIZAÇÃO EM MASSA (COM VALIDAÇÃO AVANÇADA) ---
+    if ($acao == 'bulk_update' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+        if (!isset($_POST['produto_ids']) || empty($_POST['produto_ids']) || !isset($_POST['bulk_action']) || empty($_POST['bulk_action'])) {
+            header("Location: gerenciar_produtos.php");
+            exit();
+        }
 
-        // Lógica de Upload da Imagem
-        $imagem_nome = 'default.jpg'; // Imagem padrão
-        if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
-            $diretorio_upload = '../assets/uploads/';
-            $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
-            $imagem_nome = uniqid() . '.' . $extensao; // Gera um nome único
+        $produto_ids = array_map('intval', $_POST['produto_ids']);
+        $bulk_action = $_POST['bulk_action'];
+        $ids_string = implode(',', $produto_ids);
+
+        $produtos_afetados = 0;
+        $produtos_ignorados_nomes = [];
+
+        // --- Lógica para Mudar Status ---
+        if ($bulk_action == 'ativar' || $bulk_action == 'desativar') {
+            $novo_status = ($bulk_action == 'ativar') ? 'ativo' : 'inativo';
             
-            // Move o arquivo para a pasta de uploads
-            if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $diretorio_upload . $imagem_nome)) {
-                die("Erro ao fazer upload da imagem.");
+            $stmt_check = $conexao->query("SELECT id, nome, status FROM produtos WHERE id IN ($ids_string)");
+            $produtos_para_alterar = [];
+
+            while ($produto = $stmt_check->fetch_assoc()) {
+                if ($produto['status'] != $novo_status) {
+                    $produtos_para_alterar[] = $produto['id'];
+                } else {
+                    $produtos_ignorados_nomes[] = $produto['nome'];
+                }
+            }
+
+            if (!empty($produtos_para_alterar)) {
+                $ids_para_alterar_string = implode(',', $produtos_para_alterar);
+                $stmt_update = $conexao->prepare("UPDATE produtos SET status = ? WHERE id IN ($ids_para_alterar_string)");
+                $stmt_update->bind_param("s", $novo_status);
+                $stmt_update->execute();
+                $produtos_afetados = $stmt_update->affected_rows;
             }
         }
         
-        // Inserção no banco de dados
-        $stmt = $conexao->prepare("INSERT INTO produtos (nome, descricao, preco, estoque, categoria_id, imagem) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssdiis", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome);
-        
-        if ($stmt->execute()) {
+        // --- Lógica para Adicionar à Coleção ---
+        elseif (strpos($bulk_action, 'add_collection_') === 0) {
+            $collection_id = (int)str_replace('add_collection_', '', $bulk_action);
+            
+            $produtos_para_adicionar = [];
+            // Verifica cada produto individualmente para evitar erro de chave duplicada
+            foreach ($produto_ids as $produto_id) {
+                $stmt_check = $conexao->prepare("SELECT COUNT(*) as total FROM produto_colecao WHERE produto_id = ? AND colecao_id = ?");
+                $stmt_check->bind_param("ii", $produto_id, $collection_id);
+                $stmt_check->execute();
+                $result = $stmt_check->get_result()->fetch_assoc();
+
+                if ($result['total'] == 0) {
+                    $produtos_para_adicionar[] = $produto_id;
+                } else {
+                    $stmt_nome = $conexao->prepare("SELECT nome FROM produtos WHERE id = ?");
+                    $stmt_nome->bind_param("i", $produto_id);
+                    $stmt_nome->execute();
+                    $produtos_ignorados_nomes[] = $stmt_nome->get_result()->fetch_assoc()['nome'];
+                }
+            }
+            
+            if (!empty($produtos_para_adicionar)) {
+                $stmt_insert = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
+                foreach ($produtos_para_adicionar as $id_prod) {
+                    $stmt_insert->bind_param("ii", $id_prod, $collection_id);
+                    $stmt_insert->execute();
+                }
+                $produtos_afetados = count($produtos_para_adicionar);
+            }
+        }
+
+        // --- Prepara a mensagem de alerta para o usuário ---
+        if (!empty($produtos_ignorados_nomes)) {
+            $nomes = implode(', ', $produtos_ignorados_nomes);
+            $_SESSION['bulk_alert_message'] = "Ação concluída. Os seguintes produtos foram ignorados pois já estavam no estado desejado: $nomes.";
+        }
+
+        header("Location: gerenciar_produtos.php?sucesso=4");
+        exit();
+    }
+
+    // --- AÇÃO: ADICIONAR PRODUTO ---
+    elseif ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+        $conexao->begin_transaction();
+        try {
+            $nome = $_POST['nome'];
+            $descricao = $_POST['descricao'];
+            $preco = str_replace(',', '.', $_POST['preco']);
+            $estoque = $_POST['estoque'];
+            $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
+            $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
+            $imagem_nome = 'default.jpg';
+
+            if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
+                $diretorio_upload = '../assets/uploads/';
+                $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
+                $imagem_nome = uniqid() . '.' . $extensao;
+                if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $diretorio_upload . $imagem_nome)) {
+                    throw new Exception("Erro ao fazer upload da imagem.");
+                }
+            }
+            
+            $stmt = $conexao->prepare("INSERT INTO produtos (nome, descricao, preco, estoque, categoria_id, imagem) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssdiis", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome);
+            $stmt->execute();
+            $produto_id = $conexao->insert_id;
+
+            if (!empty($colecoes)) {
+                $stmt_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
+                foreach ($colecoes as $colecao_id) {
+                    $stmt_colecao->bind_param("ii", $produto_id, $colecao_id);
+                    $stmt_colecao->execute();
+                }
+            }
+            $conexao->commit();
             header("Location: gerenciar_produtos.php?sucesso=1");
-        } else {
+        } catch (Exception $e) {
+            $conexao->rollback();
             header("Location: gerenciar_produtos.php?erro=1");
         }
+        exit();
     }
 
     // --- AÇÃO: EDITAR PRODUTO ---
     elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
-        // Coleta de dados do formulário
-        $id = $_POST['id'];
-        $nome = $_POST['nome'];
-        $descricao = $_POST['descricao'];
-        $preco = str_replace(['.', ','], ['', '.'], $_POST['preco']); // Formato para o DB
-        $estoque = $_POST['estoque'];
-        $categoria_id = $_POST['categoria_id'];
-        $imagem_antiga = $_POST['imagem_antiga'];
-        $imagem_nome = $imagem_antiga; // Assume que a imagem não vai mudar
+        $conexao->begin_transaction();
+        try {
+            $id = (int)$_POST['id'];
+            $nome = $_POST['nome'];
+            $descricao = $_POST['descricao'];
+            $preco = str_replace(['.', ','], ['', '.'], $_POST['preco']);
+            $estoque = $_POST['estoque'];
+            $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
+            $imagem_antiga = $_POST['imagem_antiga'];
+            $imagem_nome = $imagem_antiga;
+            $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
 
-        // Lógica para UPLOAD de NOVA IMAGEM, se houver
-        if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
-            $diretorio_upload = '../assets/uploads/';
-            
-            // Apaga a imagem antiga (se não for a default)
-            if ($imagem_antiga != 'default.jpg' && file_exists($diretorio_upload . $imagem_antiga)) {
-                unlink($diretorio_upload . $imagem_antiga);
+            if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
+                $diretorio_upload = '../assets/uploads/';
+                if ($imagem_antiga != 'default.jpg' && file_exists($diretorio_upload . $imagem_antiga)) {
+                    unlink($diretorio_upload . $imagem_antiga);
+                }
+                $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
+                $imagem_nome = uniqid() . '.' . $extensao;
+                move_uploaded_file($_FILES['imagem']['tmp_name'], $diretorio_upload . $imagem_nome);
             }
-            
-            // Processa a nova imagem
-            $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
-            $imagem_nome = uniqid() . '.' . $extensao;
-            move_uploaded_file($_FILES['imagem']['tmp_name'], $diretorio_upload . $imagem_nome);
-        }
 
-        // Atualização no banco de dados
-        $stmt = $conexao->prepare("UPDATE produtos SET nome = ?, descricao = ?, preco = ?, estoque = ?, categoria_id = ?, imagem = ? WHERE id = ?");
-        $stmt->bind_param("ssdiisi", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome, $id);
-        
-        if ($stmt->execute()) {
-            header("Location: gerenciar_produtos.php?sucesso=2"); // Sucesso tipo 2 (edição)
-        } else {
+            $stmt_produto = $conexao->prepare("UPDATE produtos SET nome = ?, descricao = ?, preco = ?, estoque = ?, categoria_id = ?, imagem = ? WHERE id = ?");
+            $stmt_produto->bind_param("ssdiisi", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome, $id);
+            $stmt_produto->execute();
+
+            $stmt_delete_colecao = $conexao->prepare("DELETE FROM produto_colecao WHERE produto_id = ?");
+            $stmt_delete_colecao->bind_param("i", $id);
+            $stmt_delete_colecao->execute();
+
+            if (!empty($colecoes)) {
+                $stmt_insert_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
+                foreach ($colecoes as $colecao_id) {
+                    $stmt_insert_colecao->bind_param("ii", $id, $colecao_id);
+                    $stmt_insert_colecao->execute();
+                }
+            }
+            $conexao->commit();
+            header("Location: gerenciar_produtos.php?sucesso=2");
+        } catch (Exception $e) {
+            $conexao->rollback();
             header("Location: gerenciar_produtos.php?erro=2");
         }
+        exit();
     }
 
-    // --- AÇÃO: EXCLUIR PRODUTO ---
-    elseif ($acao == 'excluir' && isset($_GET['id'])) {
-        $id = $_GET['id'];
-
-        // Em vez de apagar, mudamos o status para 'inativo'
+    // --- AÇÃO: DESATIVAR PRODUTO ---
+    elseif ($acao == 'desativar' && isset($_GET['id'])) {
+        $id = (int)$_GET['id'];
         $stmt = $conexao->prepare("UPDATE produtos SET status = 'inativo' WHERE id = ?");
         $stmt->bind_param("i", $id);
-        
         if ($stmt->execute()) {
             header("Location: gerenciar_produtos.php?sucesso=3");
         } else {
             header("Location: gerenciar_produtos.php?erro=3");
         }
+        exit();
+    }
+
+    // --- AÇÃO: REATIVAR PRODUTO ---
+    elseif ($acao == 'reativar' && isset($_GET['id'])) {
+        $id = (int)$_GET['id'];
+        $stmt = $conexao->prepare("UPDATE produtos SET status = 'ativo' WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            header("Location: gerenciar_produtos.php?sucesso=3");
+        } else {
+            header("Location: gerenciar_produtos.php?erro=3");
+        }
+        exit();
     }
 }
 
+// Redirecionamento padrão caso nenhuma ação seja encontrada
+header("Location: gerenciar_produtos.php");
 exit();
 ?>

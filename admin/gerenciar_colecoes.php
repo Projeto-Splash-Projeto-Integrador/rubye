@@ -1,0 +1,47 @@
+<?php include 'partials/header.php'; ?>
+
+<h2>Gerenciar Coleções</h2>
+
+<div class="form-container">
+    <h3>Adicionar Nova Coleção</h3>
+    <form action="acoes_colecao.php?acao=adicionar" method="POST" enctype="multipart/form-data">
+        <label for="nome">Nome da Coleção:</label>
+        <input type="text" id="nome" name="nome" required>
+        
+        <label for="imagem">Imagem da Coleção (Capa):</label>
+        <input type="file" id="imagem" name="imagem">
+
+        <button type="submit">Salvar Coleção</button>
+    </form>
+</div>
+
+<div class="table-container">
+    <h3>Coleções Cadastradas</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Imagem</th>
+                <th>Nome</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $colecoes = $conexao->query("SELECT * FROM colecoes ORDER BY nome ASC");
+            while ($colecao = $colecoes->fetch_assoc()) {
+            ?>
+                <tr>
+                    <td><?php echo $colecao['id']; ?></td>
+                    <td><img src="../assets/uploads/<?php echo htmlspecialchars($colecao['imagem'] ?? 'default.jpg'); ?>" alt="<?php echo htmlspecialchars($colecao['nome']); ?>" width="100"></td>
+                    <td><?php echo htmlspecialchars($colecao['nome']); ?></td>
+                    <td>
+                        <a href="acoes_colecao.php?acao=excluir&id=<?php echo $colecao['id']; ?>" onclick="return confirm('Tem certeza?');">Excluir</a>
+                    </td>
+                </tr>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
+
+<?php include 'partials/footer.php'; ?>

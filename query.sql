@@ -5,7 +5,6 @@ CREATE DATABASE IF NOT EXISTS rubye_db CHARACTER SET utf8mb4 COLLATE utf8mb4_uni
 USE rubye_db;
 
 -- Tabela: categorias
--- Armazena as categorias dos produtos.
 CREATE TABLE `categorias` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(100) NOT NULL,
@@ -14,12 +13,11 @@ CREATE TABLE `categorias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tabela: usuarios
--- Armazena informações dos clientes e administradores.
 CREATE TABLE `usuarios` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(255) NOT NULL,
   `email` VARCHAR(255) NOT NULL,
-  `senha` VARCHAR(255) NOT NULL, -- Essencial para armazenar o hash da senha
+  `senha` VARCHAR(255) NOT NULL,
   `role` ENUM('cliente', 'admin') NOT NULL DEFAULT 'cliente',
   `data_cadastro` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -27,23 +25,21 @@ CREATE TABLE `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tabela: produtos (VERSÃO ATUALIZADA)
--- Armazena todos os produtos da loja.
 CREATE TABLE `produtos` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(255) NOT NULL,
   `descricao` TEXT,
   `preco` DECIMAL(10, 2) NOT NULL,
-  `imagem` VARCHAR(255) NOT NULL, -- Caminho para o arquivo da imagem
+  `imagem` VARCHAR(255) NOT NULL,
   `estoque` INT NOT NULL DEFAULT 0,
   `categoria_id` INT,
-  `status` ENUM('ativo','inativo') NOT NULL DEFAULT 'ativo', -- Coluna para "apagar de forma lógica"
+  `status` ENUM('ativo','inativo') NOT NULL DEFAULT 'ativo',
   PRIMARY KEY (`id`),
   KEY `fk_categoria` (`categoria_id`),
   CONSTRAINT `fk_produtos_categorias` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tabela: pedidos
--- Armazena o cabeçalho de cada pedido realizado.
 CREATE TABLE `pedidos` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `usuario_id` INT NOT NULL,
@@ -56,7 +52,6 @@ CREATE TABLE `pedidos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Tabela: pedido_itens
--- Armazena os itens específicos de cada pedido.
 CREATE TABLE `pedido_itens` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `pedido_id` INT NOT NULL,
@@ -67,7 +62,7 @@ CREATE TABLE `pedido_itens` (
   KEY `fk_pedido` (`pedido_id`),
   KEY `fk_produto` (`produto_id`),
   CONSTRAINT `fk_pedido_itens_pedidos` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_pedido_itens_produtos` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE -- RESTRICT para não deixar apagar um produto que está em um pedido
+  CONSTRAINT `fk_pedido_itens_produtos` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Inserindo um usuário administrador padrão para testes

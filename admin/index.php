@@ -6,8 +6,10 @@ include 'partials/header.php';
 $result_pendentes = $conexao->query("SELECT COUNT(id) AS total FROM pedidos WHERE status = 'Pendente'");
 $pedidos_pendentes = $result_pendentes->fetch_assoc()['total'];
 
-// 2. Faturamento total (considerando pedidos concluídos)
-$result_faturamento = $conexao->query("SELECT SUM(total) AS faturamento FROM pedidos WHERE status = 'Concluído'");
+// 2. Faturamento (considerando pedidos com pagamento confirmado em diante) [MODIFICADO]
+$status_faturamento = ['Pagamento Confirmado', 'Em Separação', 'Enviado', 'Em rota de entrega', 'Entregue', 'Concluído'];
+$placeholders = implode("','", $status_faturamento);
+$result_faturamento = $conexao->query("SELECT SUM(total) AS faturamento FROM pedidos WHERE status IN ('$placeholders')");
 $faturamento = $result_faturamento->fetch_assoc()['faturamento'] ?? 0; // ?? 0 para caso seja NULL
 
 // 3. Número total de clientes cadastrados
@@ -31,7 +33,7 @@ $total_produtos = $result_produtos->fetch_assoc()['total'];
             <a href="ver_pedidos.php">Ver Pedidos</a>
         </div>
         <div class="card">
-            <h3>Faturamento (Concluído)</h3>
+            <h3>Faturamento (Pagamentos Confirmados)</h3>
             <p class="stat">R$ <?php echo number_format($faturamento, 2, ',', '.'); ?></p>
             <a href="ver_pedidos.php">Ver Relatórios</a>
         </div>

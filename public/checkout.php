@@ -1,13 +1,13 @@
 <?php 
 include 'partials/header.php'; 
 
-// Segurança: Se o usuário não estiver logado, redireciona para o login
+// Segurança: Se o utilizador não estiver logado, redireciona para o login
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php?erro=login_necessario');
     exit();
 }
 
-// Se o carrinho estiver vazio, não há por que estar aqui. Redireciona.
+// Se o carrinho estiver vazio, redireciona.
 if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
     header('Location: carrinho.php');
     exit();
@@ -15,7 +15,7 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
 ?>
 
 <div class="checkout-page">
-    <h2>Finalizar Compra</h2>
+    <h2 class="section-title">Finalizar Compra</h2>
 
     <div class="checkout-container">
         <div class="order-summary">
@@ -29,7 +29,6 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
                 </thead>
                 <tbody>
                     <?php
-                    // Lógica para buscar os produtos e calcular o total (similar ao carrinho.php)
                     $total_pedido = 0;
                     $ids_produtos = array_keys($_SESSION['carrinho']);
                     $placeholders = implode(',', array_fill(0, count($ids_produtos), '?'));
@@ -54,7 +53,7 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
                 <tfoot>
                     <tr>
                         <th>Total</th>
-                        <th>R$ <?php echo number_format($total_pedido, 2, ',', '.'); ?></th>
+                        <td>R$ <?php echo number_format($total_pedido, 2, ',', '.'); ?></td>
                     </tr>
                 </tfoot>
             </table>
@@ -65,7 +64,6 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
             <p><strong>Nome:</strong> <?php echo htmlspecialchars($_SESSION['usuario_nome']); ?></p>
             <p><strong>Email:</strong> 
                 <?php 
-                // Busca o email do usuário logado para exibir
                 $id_usuario = $_SESSION['usuario_id'];
                 $stmt_user = $conexao->prepare("SELECT email FROM usuarios WHERE id = ?");
                 $stmt_user->bind_param("i", $id_usuario);
@@ -79,8 +77,8 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
     </div>
 
     <div class="checkout-actions">
-        <a href="finalizar_pedido.php" class="btn-primary btn-confirm">Confirmar Pedido</a>
-        <a href="carrinho.php" class="btn-secondary">Voltar ao Carrinho</a>
+        <a href="finalizar_pedido.php" class="btn-primary">Confirmar Pedido</a>
+        <a href="carrinho.php">Voltar ao Carrinho</a>
     </div>
 </div>
 

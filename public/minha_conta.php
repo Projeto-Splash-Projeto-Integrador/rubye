@@ -17,7 +17,6 @@ $usuario_id = $_SESSION['usuario_id'];
     <p>Bem-vindo à sua área de cliente. Aqui pode visualizar o seu histórico de pedidos.</p>
 
     <?php
-    // Exibe uma mensagem de sucesso se o cliente acabou de fazer um pedido
     if (isset($_GET['sucesso']) && $_GET['sucesso'] == 'pedido_realizado') {
         echo '<p class="success">O seu pedido foi realizado com sucesso! Obrigado por comprar na RUBYE.</p>';
     }

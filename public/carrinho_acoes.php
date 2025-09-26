@@ -62,14 +62,11 @@ if (isset($_GET['acao'])) {
 
         if (isset($_SESSION['carrinho'][$id_produto])) {
             if ($quantidade <= 0) {
-                // Se a quantidade for 0 ou menos, remove o item
                 unset($_SESSION['carrinho'][$id_produto]);
             } else {
-                // Senão, atualiza a quantidade
                 $_SESSION['carrinho'][$id_produto] = $quantidade;
             }
         }
-        // Redireciona de volta para a página do carrinho
         header('Location: carrinho.php');
         exit();
     }

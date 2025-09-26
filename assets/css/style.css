@@ -1,5 +1,3 @@
-
-
 :root {
     --background-color: #ffffff;
     --text-color: #000000;
@@ -8,6 +6,7 @@
     --font-body: 'Work Sans', sans-serif;
 }
 
+/* === GERAL E CORREÇÃO DO RODAPÉ (STICKY FOOTER) === */
 html {
     height: 100%;
 }
@@ -18,9 +17,17 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     font-weight: 400;
+    /* Configuração do Sticky Footer */
     min-height: 100%;
     display: flex;
     flex-direction: column;
+    
+}
+
+/* Faz com que o conteúdo principal (público e admin) se estique */
+.site-main,
+.admin-container {
+    flex-grow: 1;
 }
 
 a {
@@ -28,30 +35,58 @@ a {
     text-decoration: none;
 }
 
-/* === CABEÇALHO === */
+/* === CABEÇALHO PÚBLICO === */
 .site-header {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr; /* Colunas: Esquerda, Centro, Direita */
     align-items: center;
     padding: 20px 40px;
     border-bottom: 1px solid var(--border-color);
-}
-.header-social { flex: 1; display: flex; gap: 20px; }
-.header-social a { font-size: 1.2em; }
-.header-logo { flex: 1; text-align: center; }
-.header-logo a { font-family: var(--font-logo); font-size: 4em; font-weight: 700; }
-.header-nav { flex: 1; display: flex; justify-content: flex-end; align-items: center; gap: 30px; }
-.main-nav a { text-transform: uppercase; font-weight: 500; letter-spacing: 1px; margin: 0 15px; font-size: 0.9em; }
-.header-icons a { font-size: 1.2em; margin-left: 15px; }
-
-/* === CONTEÚDO PRINCIPAL === */
-.site-main,.admin-container {
-    padding: 0;
-    flex-grow: 1;
-
+    gap: 20px;
 }
 
-/* === CARROSSEL (MELHORADO) === */
+.header-logo a { 
+    font-family: var(--font-logo); 
+    font-size: 4em; 
+    font-weight: 700; 
+}
+
+.header-nav {
+    display: flex;
+    justify-content: flex-end; /* Alinha os ícones à direita */
+}
+
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-icons a { 
+    font-size: 1.2em; 
+}
+
+/* Navegação Secundária */
+.secondary-nav {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.secondary-nav a {
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    color: #555;
+}
+.secondary-nav a:hover {
+    color: #000;
+}
+
+
+/* === CARROSSEL === */
 .splide { position: relative; }
 .splide__slide { position: relative; display: flex; justify-content: center; align-items: center; }
 .splide__slide::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.3); }
@@ -61,15 +96,21 @@ a {
 .btn-slide { background-color: #fff; color: #000; padding: 15px 35px; font-weight: 700; text-transform: uppercase; transition: all 0.3s ease; }
 .btn-slide:hover { background-color: #eee; }
 
-/* === SECÇÃO DE DESTAQUES (MELHORADA) === */
+/* === SECÇÕES E BOTÕES GERAIS === */
 .destaques { padding: 80px 40px; background-color: #fafafa; }
 .section-title { text-align: center; font-size: 1.8em; font-weight: 700; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 50px; }
 .see-all-container { text-align: center; margin-top: 50px; }
 .btn-primary { background-color: transparent; color: var(--text-color); border: 1px solid var(--text-color); padding: 12px 40px; font-weight: 700; text-transform: uppercase; transition: all 0.3s ease; cursor: pointer; }
 .btn-primary:hover { background-color: var(--text-color); color: var(--background-color); }
+.btn-secondary { background-color: #666; color: #fff; padding: 10px 25px; text-transform: uppercase; font-size: 0.9em; font-weight: 700; border: none; transition: background-color 0.3s ease; }
+.btn-secondary:hover { background-color: #444; }
 
-/* === CARDS DE PRODUTO (COM PROPORÇÃO 1x1) === */
-.product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
+.product-grid {
+    display: grid;
+    /* Cria o máximo de colunas que couberem, com um tamanho ideal de 280px */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px; /* Reduz um pouco o espaçamento */
+}
 .product-card { text-align: left; }
 .product-image-container { overflow: hidden; margin-bottom: 15px; aspect-ratio: 1 / 1; background-color: #f0f0f0; }
 .product-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
@@ -77,525 +118,159 @@ a {
 .product-card h4 { margin: 0 0 5px 0; font-weight: 500; font-size: 1em; }
 .product-card .price { font-weight: 400; color: #555; }
 
-/* === ESTILIZAÇÃO ESPECÍFICA PARA produtos.php === */
-.product-gallery-page { display: grid; grid-template-columns: 250px 1fr; gap: 60px; padding: 40px; align-items: start; }
+/* === ESPAÇAMENTO DAS PÁGINAS DE CONTEÚDO === */
+.cart-page, .checkout-page, .account-page, .product-page-container, .product-gallery-page, .login-container {
+    padding: 40px;
+}
+
+/* === PÁGINA DE PRODUTOS (SHOP) === */
+.product-gallery-page { display: grid; grid-template-columns: 250px 1fr; gap: 60px; align-items: start; }
 .sidebar-filters h3 { font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); margin: 0 0 15px 0; }
 .sidebar-filters ul { list-style: none; padding: 0; margin: 0; }
 .sidebar-filters ul li a { display: block; padding: 12px 15px; color: #555; font-weight: 500; border-radius: 5px; transition: all 0.2s ease; }
 .sidebar-filters ul li a:hover { background-color: #f4f4f4; color: #000; }
 .product-list h2 { font-size: 2.2em; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 40px 0; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; }
 
-/*
-==============================================
-=== ESTILIZAÇÃO ESPECÍFICA PARA produto.php ===
-==============================================
-*/
-.product-page-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Duas colunas de tamanho igual */
-    gap: 50px;
-    padding: 60px 40px;
-    max-width: 1200px;
-    margin: 0 auto; /* Centraliza o container */
-}
-.product-gallery {
-    display: flex;
-    justify-content: center;
-    align-items: start;
-}
-.product-gallery img {
-    max-width: 100%;
-    border: 1px solid var(--border-color);
-}
-.product-details {
-    display: flex;
-    flex-direction: column;
-}
-.product-category {
-    text-transform: uppercase;
-    color: #888;
-    font-size: 0.9em;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-}
-.product-title {
-    font-size: 2.5em;
-    font-weight: 700;
-    margin: 0 0 15px 0;
-    line-height: 1.2;
-}
-.product-price {
-    font-size: 1.8em;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 25px;
-}
-.product-description {
-    color: #555;
-    line-height: 1.8;
-    border-top: 1px solid var(--border-color);
-    padding-top: 25px;
-}
-.form-add-to-cart {
-    margin-top: auto; /* Empurra o formulário para a parte de baixo */
-    padding-top: 25px;
-    border-top: 1px solid var(--border-color);
-}
-.quantity-selector {
-    margin-bottom: 20px;
-}
-.quantity-selector label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 0.9em;
-    color: #777;
-}
-.quantity-selector input {
-    width: 80px;
-    padding: 10px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-}
-.btn-add-to-cart {
-    width: 100%;
-    padding: 18px;
-    background-color: var(--text-color);
-    color: var(--background-color);
-    border: none;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 1em;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-.btn-add-to-cart:hover {
-    background-color: #333;
-}
+/* === PÁGINA DE DETALHE DO PRODUTO === */
+.product-page-container { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; max-width: 1200px; margin: 0 auto; }
+.product-gallery { display: flex; justify-content: center; align-items: start; }
+.product-gallery img { max-width: 100%; border: 1px solid var(--border-color); }
+.product-details { display: flex; flex-direction: column; }
+.product-category { text-transform: uppercase; color: #888; font-size: 0.9em; letter-spacing: 1px; margin-bottom: 10px; }
+.product-title { font-size: 2.5em; font-weight: 700; margin: 0 0 15px 0; line-height: 1.2; }
+.product-price { font-size: 1.8em; font-weight: 500; color: #333; margin-bottom: 25px; }
+.product-description { color: #555; line-height: 1.8; border-top: 1px solid var(--border-color); padding-top: 25px; }
+.form-add-to-cart { margin-top: auto; padding-top: 25px; border-top: 1px solid var(--border-color); }
+.quantity-selector { margin-bottom: 20px; }
+.quantity-selector label { display: block; margin-bottom: 8px; font-size: 0.9em; color: #777; }
+.quantity-selector input { width: 80px; padding: 10px; text-align: center; border: 1px solid var(--border-color); }
+.btn-add-to-cart { width: 100%; padding: 18px; background-color: var(--text-color); color: var(--background-color); border: none; text-transform: uppercase; font-weight: 700; font-size: 1em; letter-spacing: 1px; cursor: pointer; transition: background-color 0.3s ease; }
+.btn-add-to-cart:hover { background-color: #333; }
+
+/* === PÁGINA DO CARRINHO === */
+.cart-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; align-items: start; }
+.cart-items-list { display: flex; flex-direction: column; gap: 20px; }
+.cart-item-card { display: grid; grid-template-columns: 100px 1fr auto auto; gap: 20px; align-items: center; padding: 20px; border: 1px solid var(--border-color); background: #fff; }
+.cart-item-image img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.item-title { font-weight: 700; margin: 0 0 5px 0; }
+.item-price, .remove-link { font-size: 0.9em; color: #555; }
+.remove-link:hover { color: #c00; }
+.cart-item-quantity .form-update-qty { display: flex; align-items: center; }
+.cart-item-quantity .qty-input { width: 60px; text-align: center; border: 1px solid var(--border-color); padding: 8px; }
+.cart-item-quantity button { padding: 9px 12px; font-size: 0.8em; margin-left: 5px; background: #eee; color: #333; border: 1px solid #ccc; }
+.cart-item-quantity button:hover { background: #ddd; }
+.cart-item-subtotal { font-weight: 700; text-align: right; }
+.cart-summary-box { border: 1px solid var(--border-color); padding: 25px; background: #fdfdfd; position: sticky; top: 40px; }
+.cart-summary-box h3 { margin-top: 0; text-transform: uppercase; font-size: 1.2em; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+.summary-row { display: flex; justify-content: space-between; margin: 15px 0; color: #555; }
+.summary-row.total-row { font-weight: 700; font-size: 1.2em; color: #000; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+.summary-actions { display: flex; flex-direction: column; align-items: center; gap: 20px; margin-top: 30px; }
+.summary-actions .back-to-shop { font-size: 0.9em; color: #555; text-decoration: underline; }
+.cart-empty { text-align: center; padding: 80px 20px; border: 1px dashed var(--border-color); }
+
+/* === PÁGINA DE CHECKOUT === */
+.checkout-page h2 { text-align: center; }
+.checkout-container { display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; background: none; border: none; max-width: 1200px; margin: 0 auto; }
+.order-summary, .customer-info { border: 1px solid var(--border-color); padding: 30px; background: #fdfdfd; }
+.order-summary h3, .customer-info h3 { margin-top: 0; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+.order-summary table { border: none; margin-top: 0; }
+.order-summary table td, .order-summary table th { border: none; padding: 15px 0; border-bottom: 1px solid var(--border-color); }
+.order-summary tfoot th, .order-summary tfoot td { border-bottom: none; font-size: 1.2em; font-weight: 700; }
+.checkout-actions { display: flex; justify-content: center; align-items: center; gap: 25px; margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 40px; }
+
+/* === PÁGINA MINHA CONTA === */
+.account-page { max-width: 900px; margin: 60px auto; padding: 0 20px; }
+.account-page h2 { text-align: center; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; margin-bottom: 15px; }
+.account-page h3, .account-page p { text-align: center; color: #555; }
+.account-page h3 { font-weight: 500; margin-bottom: 40px; }
+.account-page .success { background-color: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; padding: 15px; margin-bottom: 40px; text-align: center; }
+.order-history { margin-top: 50px; }
+.order-history h4 { text-align: center; font-size: 1.2em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+.order-history table { border: 1px solid var(--border-color); border-radius: 5px; overflow: hidden; }
+.order-history table th { background: #f8f8f8; text-align: left; padding: 15px 10px; }
+.order-history table td { border-top: 1px solid var(--border-color); padding: 20px 10px; }
+.order-history table tr:hover td { background-color: #f9f9f9; }
+.account-actions { text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid var(--border-color); }
+
+/* === PÁGINAS DE LOGIN E REGISTRO === */
+.login-container { max-width: 450px; margin: 60px auto; padding: 50px; border: 1px solid var(--border-color); background: #fff; }
+.login-container h2 { text-align: center; text-transform: uppercase; font-weight: 700; letter-spacing: 2px; margin-top: 0; margin-bottom: 30px; }
+.login-container label { display: block; text-align: left; margin-bottom: 8px; font-size: 0.9em; color: #555; font-weight: 500; }
+.login-container input[type="text"], .login-container input[type="email"], .login-container input[type="password"] { width: 100%; box-sizing: border-box; margin-bottom: 20px; padding: 12px; background-color: #f9f9f9; border: 1px solid var(--border-color); }
+.login-container button { width: 100%; padding: 15px; background-color: var(--text-color); color: var(--background-color); border: 1px solid var(--text-color); margin-top: 10px; text-transform: uppercase; font-weight: 700; cursor: pointer; transition: background-color 0.3s ease; }
+.login-container button:hover { background-color: #333; }
+.login-container p { text-align: center; margin-top: 25px; font-size: 0.9em; color: #555; }
+.login-container p a { color: var(--text-color); font-weight: 700; text-decoration: underline; }
+.login-container .error { background-color: #ffebee; border: 1px solid #e57373; color: #c62828; padding: 10px; margin-bottom: 20px; text-align: center; }
 
 /*
 ============================================================
-=== ESTILIZAÇÃO ESPECÍFICA PARA O CARRINHO (carrinho.php) ===
+=== ESTILIZAÇÃO DO PAINEL DE ADMINISTRADOR ===
 ============================================================
 */
 
-.cart-page .section-title {
-    text-align: left;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 20px;
+.admin-container {
+    padding: 40px !important;
 }
-
-.cart-layout {
-    display: grid;
-    grid-template-columns: 2fr 1fr; /* Coluna da esquerda 2x maior que a da direita */
-    gap: 40px;
-    align-items: start;
-}
-
-/* --- Coluna da Esquerda: Itens --- */
-.cart-items-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-.cart-item-card {
-    display: grid;
-    grid-template-columns: 100px 1fr auto auto; /* Imagem | Detalhes | Quantidade | Preço */
-    gap: 20px;
-    align-items: center;
-    padding: 20px;
-    border: 1px solid var(--border-color);
-    background: #fff;
-}
-
-.cart-item-image img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-}
-
-.item-title {
-    font-weight: 700;
-    margin: 0 0 5px 0;
-}
-
-.item-price, .remove-link {
-    font-size: 0.9em;
-    color: #555;
-}
-.remove-link:hover {
-    color: #c00;
-}
-
-.cart-item-quantity .form-update-qty {
-    display: flex;
-    align-items: center;
-}
-.cart-item-quantity .qty-input {
-    width: 60px;
-    text-align: center;
-    border: 1px solid var(--border-color);
-    padding: 8px;
-}
-.cart-item-quantity button {
-    padding: 9px 12px;
-    font-size: 0.8em;
-    margin-left: 5px;
-    background: #eee;
-    color: #333;
-    border: 1px solid #ccc;
-}
-.cart-item-quantity button:hover {
-    background: #ddd;
-}
-
-.cart-item-subtotal {
-    font-weight: 700;
-    text-align: right;
-}
-
-/* --- Coluna da Direita: Resumo --- */
-.cart-summary-box {
-    border: 1px solid var(--border-color);
-    padding: 25px;
-    background: #fdfdfd;
-    position: sticky; /* Fica fixo ao rolar a página */
-    top: 40px;
-}
-
-.cart-summary-box h3 {
-    margin-top: 0;
-    text-transform: uppercase;
-    font-size: 1.2em;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.summary-row {
+.admin-header {
     display: flex;
     justify-content: space-between;
-    margin: 15px 0;
-    color: #555;
-}
-.summary-row.total-row {
-    font-weight: 700;
-    font-size: 1.2em;
-    color: #000;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
-}
-
-.summary-actions .btn-primary {
-    width: 100%;
-    margin-bottom: 15px;
-}
-.summary-actions .back-to-shop {
-    display: block;
-    text-align: center;
-    font-size: 0.9em;
-    color: #555;
-    text-decoration: underline;
-    margin-top: 30px;
-}
-
-/* --- Carrinho Vazio --- */
-.cart-empty {
-    text-align: center;
-    padding: 80px 20px;
-    border: 1px dashed var(--border-color);
-}
-
-.cart-page,
-.checkout-page,
-.account-page,
-.login-container,
-.product-page-container {
-    padding-left: 80px;
-    padding-right: 80px;
-}
-
-/*
-============================================================
-=== MELHORIAS FINAIS PARA CHECKOUT E CARRINHO ===
-============================================================
-*/
-
-/* --- Tela: Checkout (checkout.php) - Melhorias de Layout --- */
-
-/* Remove a regra de padding antiga para evitar duplicação */
-.checkout-page {
-    padding-left: 0;
-    padding-right: 0;
-}
-
-.checkout-page h2 {
-    /* Usa o estilo de título padrão que definimos */
-    font-size: 1.8em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 50px;
-    text-align: center;
-}
-
-.checkout-container {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr; /* Coluna do resumo maior que a de dados */
-    gap: 50px;
-    padding: 0;
-    background: none;
-    border: none;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.order-summary, .customer-info {
-    border: 1px solid var(--border-color);
-    padding: 30px;
-    background: #fdfdfd;
-}
-
-.order-summary h3, .customer-info h3 {
-    margin-top: 0;
-    font-size: 1.2em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.order-summary table {
-    border: none;
-    margin-top: 0;
-}
-.order-summary table td, .order-summary table th {
-    border: none;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-.order-summary tfoot th, .order-summary tfoot td {
-    border-bottom: none;
-    font-size: 1.2em;
-    font-weight: 700;
-}
-
-/* --- Ações do Checkout (Corrigido) --- */
-.checkout-actions {
-    display: flex;
-    justify-content: center; /* Centraliza os itens na horizontal */
-    align-items: center;   /* Alinha os itens na vertical */
-    gap: 25px;             /* Aumenta o espaçamento entre os botões */
-    margin-top: 40px;
-    border-top: 1px solid var(--border-color);
-    padding-top: 40px;
-}
-
-/* --- Tela: Carrinho (carrinho.php) - Ajuste de Espaçamento --- */
-
-/* Ajusta o espaçamento do botão "Finalizar Compra" */
-.summary-actions {
-    margin-top: 30px; /* Aumenta o espaço ACIMA do botão */
-    gap: 20px;         /* Aumenta o espaço ABAIXO do botão (entre ele e o link) */
-}
-
-/*
-============================================================
-=== ESTILIZAÇÃO ESPECÍFICA PARA MINHA CONTA (minha_conta.php) ===
-============================================================
-*/
-
-.account-page {
-    max-width: 900px; /* Limita a largura para melhor legibilidade */
-    margin: 40px auto; /* Centraliza a caixa de conteúdo */
-    padding: 0;
-}
-
-.account-page h2 {
-    font-size: 1.8em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.account-page h3 {
-    text-align: center;
-    font-weight: 500;
-    color: #555;
-    margin-bottom: 40px;
-}
-
-/* Estilo para a mensagem de sucesso do pedido */
-.account-page .success {
-    background-color: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #166534;
-    padding: 15px;
-    margin-bottom: 40px;
-    text-align: center;
-}
-
-.order-history h4 {
-    font-size: 1.2em;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0;
-}
-
-.order-history table {
-    border: none;
-}
-
-.order-history table th {
-    background: none;
-    text-align: left;
-    padding: 15px 10px;
-}
-
-.order-history table td {
-    border-top: 1px solid var(--border-color);
-    padding: 20px 10px;
-}
-
-.order-history table tr:hover {
-    background-color: #f9f9f9;
-}
-
-/*
-============================================================
-=== ESTILIZAÇÃO PARA LOGIN, REGISTRO E MINHA CONTA ===
-============================================================
-*/
-
-/* --- Estilo para o Botão de Logout em minha_conta.php --- */
-.account-actions {
-    text-align: center;
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid var(--border-color);
-}
-.btn-secondary {
-    background-color: #666;
-    color: #fff;
-    padding: 10px 25px;
-    text-transform: uppercase;
-    font-size: 0.9em;
-    font-weight: 700;
-    border: none;
-    transition: background-color 0.3s ease;
-}
-.btn-secondary:hover {
-    background-color: #444;
-}
-
-
-/* --- Estilo para as Telas de Login e Registro --- */
-.login-container {
-    max-width: 450px;
-    margin: 60px auto;
-    padding: 50px;
-    border: 1px solid var(--border-color);
+    align-items: center;
+    padding: 20px 40px;
     background: #fff;
+    border-bottom: 1px solid var(--border-color);
 }
-.login-container h2 {
-    text-align: center;
-    text-transform: uppercase;
+.admin-header h1 {
+    margin: 0;
+    font-size: 1.5em;
     font-weight: 700;
-    letter-spacing: 2px;
-    margin-top: 0;
-    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
-.login-container label {
+.admin-header nav a {
+    margin: 0 0 0 25px;
     font-size: 0.9em;
+    font-weight: 500;
+    text-transform: uppercase;
     color: #555;
+    transition: color 0.2s ease;
 }
-.login-container input[type="text"],
-.login-container input[type="email"],
-.login-container input[type="password"] {
-    width: 100%;                  /* ADICIONE ESTA LINHA */
-    box-sizing: border-box;       /* ADICIONE ESTA LINHA */
-    margin-bottom: 20px;
-    padding: 12px;
-    background-color: #f9f9f9;
+.admin-header nav a:hover {
+    color: #000;
+}
+.admin-container h2 {
+    text-align: center;
+    margin-bottom: 50px;
+}
+.form-container, .table-container {
+    max-width: 1000px;
+    margin: 0 auto 40px auto;
+    background: #fff;
+    padding: 30px;
     border: 1px solid var(--border-color);
 }
-.login-container button {
-    width: 100%;
-    padding: 15px;
-    background-color: var(--text-color);
-    color: var(--background-color);
-    border: 1px solid var(--text-color);
-    margin-top: 10px;
-    text-transform: uppercase;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+.form-container h3, .table-container h3 {
+    margin-top: 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
 }
-.login-container button:hover {
-    background-color: #333;
+.admin-container table img {
+    border: 1px solid var(--border-color);
 }
-.login-container p {
-    text-align: center;
-    margin-top: 25px;
-    font-size: 0.9em;
-    color: #555;
-}
-/* --- Correção de Alinhamento para Formulários de Login/Registro --- */
-.login-container label {
-    display: flex;       /* Força a etiqueta a ocupar a sua própria linha */
-    text-align: left;     /* Alinha o texto da etiqueta à esquerda */
-    margin-bottom: 8px;   /* Adiciona um pequeno espaço entre a etiqueta e o campo de texto */
-    font-size: 0.9em;
-    color: #555;
-    font-weight: 500;
-}
-.login-container .error {
-    background-color: #ffebee;
-    border: 1px solid #e57373;
-    color: #c62828;
-    padding: 10px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/*
-============================================================
-=== ESTILIZAÇÃO PARA O DASHBOARD DO ADMIN (index.php) ===
-============================================================
-*/
-
 .dashboard-page {
     max-width: 1200px;
     margin: 40px auto;
 }
-
-.dashboard-page h2 {
-    font-size: 1.8em;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
 .dashboard-page p {
     text-align: center;
     color: #555;
     margin-bottom: 50px;
 }
-
 .dashboard-grid {
     display: grid;
-    /* Cria 4 colunas em ecrãs grandes, 2 em médios e 1 em pequenos */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 30px;
 }
-
 .dashboard-grid .card {
     background: #fff;
     border: 1px solid var(--border-color);
@@ -603,12 +278,10 @@ a {
     text-align: center;
     transition: all 0.3s ease;
 }
-
 .dashboard-grid .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
-
 .dashboard-grid .card h3 {
     margin-top: 0;
     font-size: 1.1em;
@@ -616,14 +289,12 @@ a {
     color: #555;
     letter-spacing: 1px;
 }
-
 .dashboard-grid .card .stat {
     font-size: 3em;
     font-weight: 700;
     color: var(--text-color);
     margin: 15px 0;
 }
-
 .dashboard-grid .card a {
     display: inline-block;
     margin-top: 15px;
@@ -635,4 +306,463 @@ a {
 }
 .dashboard-grid .card a:hover {
     background-color: #ddd;
+}
+
+/*
+============================================================
+=== ESTILO PARA EDIÇÃO DE STATUS DE PEDIDO (ver_pedidos.php) ===
+============================================================
+*/
+
+/* Classe utilitária para esconder elementos */
+.hidden {
+    display: none !important;
+}
+
+/* Estilo para o contentor de visualização */
+.status-view {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+.status-view span {
+    font-weight: 500;
+}
+
+/* Botão pequeno para "Alterar" */
+.btn-edit-status {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.btn-edit-status:hover {
+    background-color: #e0e0e0;
+}
+
+/* Formulário de edição */
+.form-status-edit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.form-status-edit select {
+    flex-grow: 1; /* Faz o select ocupar o espaço disponível */
+}
+
+/* Botão de Salvar */
+.btn-save-status {
+    padding: 8px 15px;
+    background-color: #28a745; /* Verde */
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.btn-save-status:hover {
+    background-color: #218838;
+}
+
+/*
+============================================================
+=== MELHORIAS DE ESTILIZAÇÃO PARA GERENCIAR PEDIDOS (ver_pedidos.php) ===
+============================================================
+*/
+
+/* Centraliza o container da tabela e ajusta o título */
+.admin-container .table-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Estilo para as mensagens de sucesso e erro */
+.admin-container .success,
+.admin-container .error {
+    max-width: 1140px; /* Alinha com a largura da tabela */
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+/* Tabela de Pedidos */
+.table-container table {
+    border-collapse: collapse; /* Remove espaçamento entre células */
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.table-container table th {
+    background-color: #f8f8f8;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    padding: 15px;
+    text-align: left;
+}
+
+.table-container table td {
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+}
+
+.table-container table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/* Estilo para o formulário de status dentro da tabela */
+.form-status select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.form-status-edit select {
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/*
+============================================================
+=== MELHORIAS DE ESTILIZAÇÃO PARA DETALHES DO PEDIDO (admin) ===
+============================================================
+*/
+
+.order-detail-page {
+    max-width: 1000px;
+    margin: 40px auto;
+}
+
+.order-detail-page > a.btn-secondary {
+    display: inline-block; /* Permite aplicar margem */
+    margin-bottom: 30px;
+}
+
+.order-detail-page h2 {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+}
+
+.order-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Duas colunas iguais */
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.customer-info-box,
+.order-info-box {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 25px;
+}
+
+.customer-info-box h4,
+.order-info-box h4,
+.order-items-box h4 {
+    margin-top: 0;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    color: #555;
+    letter-spacing: 1px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-items-box {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    padding: 25px;
+}
+
+.order-items-box table {
+    border: none;
+}
+.order-items-box table th {
+    background: none;
+}
+.order-items-box table td {
+    border-top: 1px solid var(--border-color);
+}
+
+/*
+==================================================================
+=== MELHORIAS PARA GERENCIAR PRODUTOS E CATEGORIAS (Admin) ===
+==================================================================
+*/
+
+/* --- Layout da Página de Gestão --- */
+.admin-container .form-container,
+.admin-container .table-container {
+    max-width: 1100px; /* Aumenta a largura máxima para acomodar melhor os formulários */
+    padding: 40px;
+}
+
+/* --- Estilo dos Formulários de Adição --- */
+.form-container form {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Cria duas colunas para os campos */
+    gap: 20px 30px; /* Espaçamento vertical e horizontal */
+    align-items: center;
+}
+
+.form-container label {
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.form-container input,
+.form-container select,
+.form-container textarea {
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+/* Faz a descrição e o botão ocuparem as duas colunas */
+.form-container label[for="descricao"],
+.form-container textarea,
+.form-container button[type="submit"] {
+    grid-column: 1 / -1;
+}
+
+.form-container button[type="submit"] {
+    background-color: var(--text-color);
+    color: var(--background-color);
+    border: none;
+    padding: 15px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.form-container button[type="submit"]:hover {
+    background-color: #333;
+}
+
+/* Ajuste específico para o formulário de categoria que é mais simples */
+.admin-container .form-container form:has(input#nome) {
+    grid-template-columns: 1fr;
+}
+
+
+/* --- Estilo das Tabelas de Gestão --- */
+.table-container table {
+    border-collapse: collapse;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.table-container table th {
+    background-color: #f8f8f8;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    letter-spacing: 1px;
+    padding: 15px;
+    text-align: left;
+}
+
+.table-container table td {
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+.table-container table img {
+    border-radius: 4px;
+}
+
+.table-container table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+/*
+============================================================
+=== ESTILO PARA A BARRA DE PESQUISA E NOVA NAVEGAÇÃO ===
+============================================================
+*/
+
+/* Ajuste no Cabeçalho Principal */
+.site-header {
+    flex-wrap: wrap; /* Permite que os itens quebrem a linha se necessário */
+}
+.header-logo {
+    flex-grow: 0; /* Impede que o logo se estique demais */
+    flex-basis: 33%; /* Ocupa um terço do espaço */
+}
+.header-social {
+    flex-basis: 33%;
+}
+.header-nav {
+    flex-basis: 33%;
+    justify-content: flex-end;
+}
+/* Barra de Pesquisa */
+.header-search {
+    grid-column: 2; /* Posiciona a busca na coluna central */
+    display: flex;
+    justify-content: center;
+    padding: 0 20px;
+    width: 500px;
+}
+.search-form {
+    display: flex;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid var(--border-color);
+}
+.search-form input[type="text"] {
+    flex-grow: 1;
+    border: none;
+    padding: 12px 15px;
+    font-size: 1em;
+    font-family: var(--font-body);
+}
+.search-form input[type="text"]:focus {
+    outline: none;
+}
+.search-form button {
+    border: none;
+    background: transparent;
+    padding: 0 15px;
+    cursor: pointer;
+    font-size: 1.1em;
+    color: #555;
+}
+
+
+/*
+============================================================
+=== ESTILO PARA AS NOVAS PÁGINAS (COLEÇÕES, SOBRE, CONTATO) ===
+============================================================
+*/
+
+/* --- Container Geral de Página --- */
+.page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+/* --- Tela: Coleções (colecoes.php) --- */
+.collection-grid {
+    display: grid;
+    /* Alterado para ter o mesmo tamanho da grade de produtos */
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 30px;
+}
+.collection-card {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+}
+.collection-card a {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.collection-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.collection-card:hover img {
+    transform: scale(1.05);
+}
+.collection-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.4);
+    color: #fff;
+}
+.collection-card-overlay h3 {
+    font-size: 2em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* --- Tela: Sobre Nós (sobre.php) --- */
+.about-hero {
+    height: 50vh;
+    background-image: url('../assets/img/about-hero.jpg'); /* Adicione uma imagem de fundo aqui */
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+}
+.about-hero h1 {
+    font-size: 4em;
+    text-transform: uppercase;
+    background: rgba(0,0,0,0.5);
+    padding: 10px 30px;
+}
+.about-content {
+    padding-top: 60px;
+}
+.about-text h2 {
+    font-size: 2em;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+.about-text p {
+    color: #555;
+    line-height: 1.8;
+}
+
+/* --- Tela: Contato (contato.php) --- */
+.contact-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 50px;
+    background: #fdfdfd;
+    padding: 40px;
+    border: 1px solid var(--border-color);
+}
+.contact-info h3, .contact-form h3 {
+    margin-top: 0;
+}
+.contact-info ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+.contact-info ul li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+.contact-info ul li i {
+    font-size: 1.2em;
+}
+.contact-social {
+    margin-top: 30px;
+    display: flex;
+    gap: 20px;
+    font-size: 1.5em;
+}
+.contact-form form {
+    display: flex;
+    flex-direction: column;
 }

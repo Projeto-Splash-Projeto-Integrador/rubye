@@ -1,4 +1,4 @@
-<?php 
+<?php
 include 'partials/header.php';
 
 // Valida o ID do produto na URL
@@ -19,6 +19,16 @@ if (!$produto) {
     echo "<p class='error'>Produto não encontrado.</p>";
     include 'partials/footer.php';
     exit();
+}
+
+// Busca as coleções já associadas a este produto
+$colecoes_atuais_stmt = $conexao->prepare("SELECT colecao_id FROM produto_colecao WHERE produto_id = ?");
+$colecoes_atuais_stmt->bind_param("i", $id);
+$colecoes_atuais_stmt->execute();
+$result_colecoes_atuais = $colecoes_atuais_stmt->get_result();
+$colecoes_atuais = [];
+while ($row = $result_colecoes_atuais->fetch_assoc()) {
+    $colecoes_atuais[] = $row['colecao_id'];
 }
 ?>
 
@@ -41,13 +51,25 @@ if (!$produto) {
         <input type="number" name="estoque" value="<?php echo $produto['estoque']; ?>" required>
 
         <label for="categoria_id">Categoria:</label>
-        <select name="categoria_id" required>
+        <select name="categoria_id">
+            <option value="">Nenhuma</option>
             <?php
             $result_cat = $conexao->query("SELECT * FROM categorias ORDER BY nome");
             while ($cat = $result_cat->fetch_assoc()) {
-                // Marca a categoria atual do produto como selecionada
                 $selected = ($cat['id'] == $produto['categoria_id']) ? 'selected' : '';
                 echo "<option value='{$cat['id']}' {$selected}>" . htmlspecialchars($cat['nome']) . "</option>";
+            }
+            ?>
+        </select>
+
+        <label for="colecoes">Coleções (segure Ctrl para selecionar várias):</label>
+        <select name="colecoes[]" id="colecoes" multiple style="height: 150px;">
+            <?php
+            $colecoes_result = $conexao->query("SELECT * FROM colecoes ORDER BY nome");
+            while ($col = $colecoes_result->fetch_assoc()) {
+                // Verifica se a coleção atual está na lista de coleções do produto
+                $selected = in_array($col['id'], $colecoes_atuais) ? 'selected' : '';
+                echo "<option value='{$col['id']}' {$selected}>" . htmlspecialchars($col['nome']) . "</option>";
             }
             ?>
         </select>

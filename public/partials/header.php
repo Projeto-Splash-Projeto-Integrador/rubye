@@ -16,36 +16,37 @@
 </head>
 <body>
     <header class="site-header">
-        <div class="header-social">
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
-        </div>
         <div class="header-logo">
             <a href="index.php">RUBYE</a>
         </div>
+        
+        <div class="header-search">
+            <form action="produtos.php" method="GET" class="search-form">
+                <input type="text" name="busca" placeholder="O que você está procurando?" required>
+                <button type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+            </form>
+        </div>
+
         <div class="header-nav">
-            <nav class="main-nav">
-                <a href="produtos.php">SHOP</a>
-                <a href="#">INFO</a>
-                <a href="#">CONTACT</a>
-            </nav>
             <div class="header-icons">
                 <a href="carrinho.php">
                     <i class="fa-solid fa-cart-shopping"></i>
                     (<span id="cart-counter"><?php echo isset($_SESSION['carrinho']) ? count($_SESSION['carrinho']) : 0; ?></span>)
                 </a>
 
-                <?php // --- AQUI ESTÁ A LÓGICA DE LOGIN/LOGOUT ---
-                if (isset($_SESSION['usuario_id'])) : ?>
-                    <a href="minha_conta.php"><i class="fa-solid fa-user"></i></a>
-                    <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i></a>
+                <?php if (isset($_SESSION['usuario_id'])) : ?>
+                    <a href="minha_conta.php" title="Minha Conta"><i class="fa-solid fa-user"></i></a>
+                    <a href="logout.php" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></a>
                 <?php else : ?>
-                    <a href="login.php">Login</a>
-                    <a href="registro.php">Registrar</a>
+                    <a href="login.php" title="Login"><i class="fa-solid fa-user"></i></a>
                 <?php endif; ?>
-                
             </div>
         </div>
     </header>
+    <nav class="secondary-nav">
+        <a href="produtos.php">PRODUTOS</a>
+        <a href="colecoes.php">COLEÇÕES</a>
+        <a href="sobre.php">SOBRE NÓS</a>
+        <a href="contato.php">CONTATO</a>
+    </nav>
     <main class="site-main">

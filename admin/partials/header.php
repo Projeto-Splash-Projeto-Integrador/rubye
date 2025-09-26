@@ -1,13 +1,9 @@
 <?php
-// Inclui o arquivo de configuração. O caminho usa __DIR__ para garantir que ele sempre funcione.
 require_once __DIR__ . '/../../config/db.php';
 
-// VERIFICAÇÃO DE SEGURANÇA FUNDAMENTAL
-// Se não houver uma sessão de usuário ou se o usuário não for 'admin',
-// ele é redirecionado para a página de login. Isso protege todo o painel.
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     header("Location: login.php");
-    exit(); // Encerra o script para garantir que nada mais seja executado.
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -25,7 +21,8 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
             <a href="index.php">Minha Conta</a>
             <a href="gerenciar_produtos.php">Produtos</a>
             <a href="gerenciar_categorias.php">Categorias</a>
-            <a href="ver_pedidos.php">Pedidos</a>
+            <a href="gerenciar_colecoes.php">Coleções</a>
+             <a href="ver_pedidos.php">Pedidos</a>
             <a href="../public/logout.php">Sair</a>
         </nav>
     </header>
