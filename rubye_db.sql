@@ -1,11 +1,14 @@
+
+CREATE DATABASE rubye_db;
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 26/09/2025 às 07:22
+-- Tempo de geração: 26/09/2025 às 14:53
 -- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
+-- Versão do PHP: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,7 +23,7 @@ SET time_zone = "+00:00";
 --
 -- Banco de dados: `rubye_db`
 --
-
+CREATE DATABASE rubye_db;
 -- --------------------------------------------------------
 
 --
@@ -84,7 +87,8 @@ INSERT INTO `pedidos` (`id`, `usuario_id`, `total`, `status`, `data_pedido`) VAL
 (1, 1, 1000.00, 'Entregue', '2025-09-25 02:59:25'),
 (2, 1, 100.00, 'Entregue', '2025-09-25 03:57:33'),
 (3, 1, 200.00, 'Entregue', '2025-09-26 03:02:43'),
-(4, 4, 2000.00, 'Entregue', '2025-09-26 04:28:00');
+(4, 4, 2000.00, 'Entregue', '2025-09-26 04:28:00'),
+(5, 1, 259.99, 'Pagamento Confirmado', '2025-09-26 12:30:04');
 
 -- --------------------------------------------------------
 
@@ -108,7 +112,8 @@ INSERT INTO `pedido_itens` (`id`, `pedido_id`, `produto_id`, `quantidade`, `prec
 (1, 1, 2, 1, 1000.00),
 (2, 2, 4, 1, 100.00),
 (3, 3, 8, 2, 100.00),
-(4, 4, 9, 2, 1000.00);
+(4, 4, 9, 2, 1000.00),
+(5, 5, 11, 1, 259.99);
 
 -- --------------------------------------------------------
 
@@ -132,16 +137,16 @@ CREATE TABLE `produtos` (
 --
 
 INSERT INTO `produtos` (`id`, `nome`, `descricao`, `preco`, `imagem`, `estoque`, `categoria_id`, `status`) VALUES
-(2, 'Theylor Antunes', 'sabao', 1000.00, '68d6201190631.png', 11, 1, 'ativo'),
-(3, 'sabao', 'teste', 100.00, '68d4bb55797c9.png', 12, 3, 'ativo'),
-(4, 'Theylor Antunes', 'sabao', 100.00, '68d4bcf17d989.png', 99, 3, 'ativo'),
-(5, 'sabao', 'ASDASDASD', 15.50, '68d4bdd960e29.png', 24, 1, 'ativo'),
-(6, 'sabao', 'asdasdas', 12.00, '68d4bf2dc102c.png', 12, 3, 'ativo'),
-(7, 'Camiseta ARGUSº', 'A melhor oversized que  você vai encontrar.', 259.99, '68d4c1340fa0b.webp', 50, 1, 'ativo'),
-(8, 'Theylor Antunes', 'bapoijsdpoias', 100.00, '68d6001ec03b0.png', 8, 2, 'ativo'),
-(9, 'asdasdas', 'asdadasd', 1000.00, '68d6013feb339.png', 121, 2, 'ativo'),
-(10, 'Camiseta ARGUSº', 'Camiseta daora pra carai fi, compra', 259.99, '68d60db517138.png', 50, 1, 'ativo'),
-(11, 'Moletom sabnonete', 'asdasdasd', 100.00, '68d61936a4e7b.jpg', 12, 4, 'ativo');
+(2, 'Calça CLASS PRETA', 'sabao', 189.99, '68d68af11636b.webp', 50, 2, 'ativo'),
+(3, 'Calça PACE VELUDO', 'teste', 209.99, '68d68ab273a45.webp', 50, 2, 'ativo'),
+(4, 'Shorts CLASS', 'sabao', 149.99, '68d68a76956d1.webp', 25, 2, 'ativo'),
+(5, 'Calça PIET JEANS', 'ASDASDASD', 189.99, '68d68a25aec64.webp', 50, 1, 'ativo'),
+(6, 'Calça CLASS STONE', 'asdasdas', 189.99, '68d6897777734.webp', 50, 2, 'ativo'),
+(7, 'Camiseta CLASS WORKING', 'A melhor oversized que  você vai encontrar.', 259.99, '68d6891a7f668.webp', 50, 1, 'ativo'),
+(8, 'Camiseta CLASS GOOD', 'bapoijsdpoias', 209.99, '68d688652d8c5.webp', 50, 1, 'ativo'),
+(9, 'Camiseta CLASS ICE BASIC', 'Camiseta CLASS ICE BASIC', 209.99, '68d68823859b0.webp', 50, 2, 'ativo'),
+(10, 'Camiseta CLASS ICE', 'Camiseta daora pra carai fi, compra', 259.99, '68d67ff6cc023.webp', 50, 1, 'ativo'),
+(11, 'Camiseta CLASS PARADISE', 'Camiseta CLASS PARADISE', 259.99, '68d67fac0d0bb.webp', 49, 1, 'ativo');
 
 -- --------------------------------------------------------
 
@@ -169,6 +174,38 @@ INSERT INTO `produto_colecao` (`produto_id`, `colecao_id`) VALUES
 (9, 1),
 (10, 1),
 (11, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `produto_imagens`
+--
+
+CREATE TABLE `produto_imagens` (
+  `id` int(11) NOT NULL,
+  `produto_id` int(11) NOT NULL,
+  `caminho_imagem` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `produto_imagens`
+--
+
+INSERT INTO `produto_imagens` (`id`, `produto_id`, `caminho_imagem`) VALUES
+(1, 11, 'prod_68d6866d847d5.webp'),
+(2, 11, 'prod_68d6866d8515d.webp'),
+(3, 10, 'prod_68d687c4eb655.webp'),
+(4, 9, 'prod_68d688238345d.webp'),
+(5, 9, 'prod_68d6882384010.webp'),
+(6, 8, 'prod_68d688652411e.webp'),
+(7, 8, 'prod_68d6886524880.webp'),
+(8, 7, 'prod_68d6891a7eb17.webp'),
+(9, 6, 'prod_68d6897775c47.webp'),
+(10, 6, 'prod_68d68977763b8.webp'),
+(11, 5, 'prod_68d68a25ac901.webp'),
+(12, 4, 'prod_68d68a769423a.webp'),
+(13, 3, 'prod_68d68ab272380.webp'),
+(14, 2, 'prod_68d68af11494d.webp');
 
 -- --------------------------------------------------------
 
@@ -242,6 +279,13 @@ ALTER TABLE `produto_colecao`
   ADD KEY `fk_colecao` (`colecao_id`);
 
 --
+-- Índices de tabela `produto_imagens`
+--
+ALTER TABLE `produto_imagens`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_produto_imagens_produto` (`produto_id`);
+
+--
 -- Índices de tabela `usuarios`
 --
 ALTER TABLE `usuarios`
@@ -268,19 +312,25 @@ ALTER TABLE `colecoes`
 -- AUTO_INCREMENT de tabela `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `pedido_itens`
 --
 ALTER TABLE `pedido_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de tabela `produtos`
 --
 ALTER TABLE `produtos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT de tabela `produto_imagens`
+--
+ALTER TABLE `produto_imagens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de tabela `usuarios`
@@ -317,6 +367,12 @@ ALTER TABLE `produtos`
 ALTER TABLE `produto_colecao`
   ADD CONSTRAINT `fk_colecao` FOREIGN KEY (`colecao_id`) REFERENCES `colecoes` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_produto` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `produto_imagens`
+--
+ALTER TABLE `produto_imagens`
+  ADD CONSTRAINT `fk_produto_imagens_produto` FOREIGN KEY (`produto_id`) REFERENCES `produtos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
