@@ -2,9 +2,24 @@
 
 <h2>Gerenciar Coleções</h2>
 
+<?php
+// Exibe mensagens de sucesso mais específicas
+if (isset($_GET['sucesso'])) {
+    $sucesso_msgs = [
+        '1' => 'Coleção adicionada com sucesso!',
+        '2' => 'Coleção excluída com sucesso!',
+        '3' => 'Coleção atualizada com sucesso!'
+    ];
+    $msg_key = $_GET['sucesso'];
+    if(isset($sucesso_msgs[$msg_key])) {
+        echo '<p class="success">' . $sucesso_msgs[$msg_key] . '</p>';
+    }
+}
+?>
+
 <div class="form-container">
     <h3>Adicionar Nova Coleção</h3>
-    <form action="acoes_colecao.php?acao=adicionar" method="POST" enctype="multipart/form-data">
+    <form action="acoes_colecoes.php?acao=adicionar" method="POST" enctype="multipart/form-data">
         <label for="nome">Nome da Coleção:</label>
         <input type="text" id="nome" name="nome" required>
         
@@ -36,7 +51,8 @@
                     <td><img src="../assets/uploads/<?php echo htmlspecialchars($colecao['imagem'] ?? 'default.jpg'); ?>" alt="<?php echo htmlspecialchars($colecao['nome']); ?>" width="100"></td>
                     <td><?php echo htmlspecialchars($colecao['nome']); ?></td>
                     <td>
-                        <a href="acoes_colecao.php?acao=excluir&id=<?php echo $colecao['id']; ?>" onclick="return confirm('Tem certeza?');">Excluir</a>
+                        <a href="editar_colecao.php?id=<?php echo $colecao['id']; ?>">Editar</a>
+                        <a href="acoes_colecoes.php?acao=excluir&id=<?php echo $colecao['id']; ?>" onclick="return confirm('Tem certeza?');">Excluir</a>
                     </td>
                 </tr>
             <?php } ?>
