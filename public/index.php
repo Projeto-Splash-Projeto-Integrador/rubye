@@ -1,6 +1,6 @@
 <?php include 'partials/header.php'; ?>
 
-<section class="splide" aria-label="Carrossel de Imagens">
+<section id="home-carousel" class="splide" aria-label="Carrossel de Imagens">
   <div class="splide__track">
         <ul class="splide__list">
             <li class="splide__slide">
@@ -32,14 +32,20 @@
     <h3 class="section-title">NEW IN</h3>
     <div class="product-grid">
         <?php
-        $sql = "SELECT * FROM produtos WHERE status = 'ativo' ORDER BY id DESC LIMIT 4";
+        $sql = "SELECT p.*, (SELECT pi.caminho_imagem FROM produto_imagens pi WHERE pi.produto_id = p.id ORDER BY pi.id ASC LIMIT 1) AS imagem_hover
+                FROM produtos p 
+                WHERE status = 'ativo' 
+                ORDER BY id DESC LIMIT 4";
         $produtos = $conexao->query($sql);
         while ($produto = $produtos->fetch_assoc()) {
         ?>
             <div class="product-card">
                 <a href="produto.php?id=<?php echo $produto['id']; ?>">
                     <div class="product-image-container">
-                        <img src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+                        <img class="img-main" src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+                        <?php if (!empty($produto['imagem_hover'])): ?>
+                            <img class="img-hover" src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem_hover']); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+                        <?php endif; ?>
                     </div>
                     <h4><?php echo htmlspecialchars($produto['nome']); ?></h4>
                     <p class="price">R$ <?php echo number_format($produto['preco'], 2, ',', '.'); ?></p>

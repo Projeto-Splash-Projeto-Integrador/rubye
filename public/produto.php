@@ -22,11 +22,35 @@ if (!$produto) {
     include 'partials/footer.php';
     exit();
 }
+
+// Busca todas as imagens do produto (principal + adicionais)
+$imagens = [];
+if (!empty($produto['imagem'])) {
+    $imagens[] = $produto['imagem']; // Adiciona a imagem principal primeiro
+}
+
+$imagens_adicionais_stmt = $conexao->prepare("SELECT caminho_imagem FROM produto_imagens WHERE produto_id = ? ORDER BY id ASC");
+$imagens_adicionais_stmt->bind_param("i", $id);
+$imagens_adicionais_stmt->execute();
+$resultado_imgs = $imagens_adicionais_stmt->get_result();
+while ($img = $resultado_imgs->fetch_assoc()) {
+    $imagens[] = $img['caminho_imagem'];
+}
 ?>
 
 <div class="product-page-container">
     <div class="product-gallery">
-        <img src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+        <section id="product-carousel" class="splide" aria-label="Fotos do Produto">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    <?php foreach ($imagens as $img_path): ?>
+                        <li class="splide__slide">
+                            <img src="../assets/uploads/<?php echo htmlspecialchars($img_path); ?>" alt="<?php echo htmlspecialchars($produto['nome']); ?>">
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </section>
     </div>
     <div class="product-details">
         <?php

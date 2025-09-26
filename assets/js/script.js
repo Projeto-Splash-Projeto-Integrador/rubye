@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
     addToCartForms.forEach(form => {
         form.addEventListener('submit', function(event) {
-            // Previne o comportamento padrão do formulário (recarregar a página)
             event.preventDefault();
 
             const formData = new FormData(this);
@@ -15,13 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                // Primeiro, verifica se a resposta é um JSON válido
-                if (!response.ok) {
-                    throw new Error('A resposta do servidor não foi OK');
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     const cartCounter = document.getElementById('cart-counter');
@@ -30,7 +23,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     alert('Produto adicionado ao carrinho!');
                 } else {
-                    // Mostra uma mensagem de erro mais específica, se o servidor a enviar
                     alert(data.message || 'Erro ao adicionar o produto.');
                 }
             })
@@ -42,9 +34,9 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     // --- LÓGICA PARA O CARROSSEL DA PÁGINA INICIAL ---
-    // Verifica se existe um elemento com a classe .splide na página
-    if (document.querySelector('.splide')) {
-        new Splide('.splide', {
+    const homeCarousel = document.getElementById('home-carousel');
+    if (homeCarousel) {
+        new Splide('#home-carousel', {
             type       : 'loop',
             autoplay   : true,
             interval   : 4000,
@@ -54,20 +46,26 @@ document.addEventListener("DOMContentLoaded", function() {
             cover      : true,
         }).mount();
     }
-});
 
-// --- LÓGICA PARA EDIÇÃO DE STATUS DO PEDIDO ---
-document.addEventListener("DOMContentLoaded", function() {
-    // Encontra todos os botões "Alterar"
+    // --- LÓGICA PARA O CARROSSEL DA PÁGINA DE PRODUTO ---
+    const productCarousel = document.getElementById('product-carousel');
+    if (productCarousel) {
+        new Splide('#product-carousel', {
+            type       : 'fade',
+            rewind     : true,
+            pagination : true,
+            arrows     : true,
+        }).mount();
+    }
+
+    // --- LÓGICA PARA EDIÇÃO DE STATUS DO PEDIDO (ADMIN) ---
     const editButtons = document.querySelectorAll('.btn-edit-status');
-
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
-            const statusCell = this.closest('td'); // A célula da tabela que contém tudo
+            const statusCell = this.closest('td');
             const viewMode = statusCell.querySelector('.status-view');
             const editModeForm = statusCell.querySelector('.form-status-edit');
 
-            // Esconde o modo de visualização e mostra o formulário de edição
             viewMode.classList.add('hidden');
             editModeForm.classList.remove('hidden');
         });

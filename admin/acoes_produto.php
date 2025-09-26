@@ -6,6 +6,24 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     die("Acesso negado.");
 }
 
+// LÓGICA PARA PROCESSAR MÚLTIPLOS UPLOADS
+function processarImagensAdicionais($conexao, $produto_id) {
+    if (isset($_FILES['imagens_adicionais']) && !empty($_FILES['imagens_adicionais']['name'][0])) {
+        $diretorio_upload = '../assets/uploads/';
+        $stmt_img = $conexao->prepare("INSERT INTO produto_imagens (produto_id, caminho_imagem) VALUES (?, ?)");
+        
+        foreach ($_FILES['imagens_adicionais']['tmp_name'] as $key => $tmp_name) {
+            if ($_FILES['imagens_adicionais']['error'][$key] === UPLOAD_ERR_OK) {
+                $extensao = pathinfo($_FILES['imagens_adicionais']['name'][$key], PATHINFO_EXTENSION);
+                $imagem_nome = 'prod_' . uniqid() . '.' . $extensao;
+                move_uploaded_file($tmp_name, $diretorio_upload . $imagem_nome);
+                $stmt_img->bind_param("is", $produto_id, $imagem_nome);
+                $stmt_img->execute();
+            }
+        }
+    }
+}
+
 // Garante que a mensagem de alerta de uma ação anterior seja limpa
 unset($_SESSION['bulk_alert_message']);
 
@@ -118,6 +136,7 @@ if (isset($_GET['acao'])) {
             $stmt->bind_param("ssdiis", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome);
             $stmt->execute();
             $produto_id = $conexao->insert_id;
+            processarImagensAdicionais($conexao, $produto_id);
 
             if (!empty($colecoes)) {
                 $stmt_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
@@ -140,6 +159,7 @@ if (isset($_GET['acao'])) {
         $conexao->begin_transaction();
         try {
             $id = (int)$_POST['id'];
+            processarImagensAdicionais($conexao, $id);
             $nome = $_POST['nome'];
             $descricao = $_POST['descricao'];
             $preco = str_replace(['.', ','], ['', '.'], $_POST['preco']);
@@ -179,6 +199,35 @@ if (isset($_GET['acao'])) {
         } catch (Exception $e) {
             $conexao->rollback();
             header("Location: gerenciar_produtos.php?erro=2");
+        }
+        exit();
+    }
+    
+    // --- NOVA AÇÃO: EXCLUIR IMAGEM ADICIONAL ---
+    elseif ($acao == 'excluir_imagem' && isset($_GET['id_imagem'])) {
+        $id_imagem = (int)$_GET['id_imagem'];
+        $id_produto = (int)$_GET['id_produto']; // Usado para redirecionar de volta
+
+        // 1. Busca o caminho da imagem para poder deletar o arquivo
+        $stmt_get = $conexao->prepare("SELECT caminho_imagem FROM produto_imagens WHERE id = ?");
+        $stmt_get->bind_param("i", $id_imagem);
+        $stmt_get->execute();
+        $resultado = $stmt_get->get_result()->fetch_assoc();
+
+        if ($resultado) {
+            $caminho_arquivo = '../assets/uploads/' . $resultado['caminho_imagem'];
+            if (file_exists($caminho_arquivo)) {
+                unlink($caminho_arquivo); // Deleta o arquivo do servidor
+            }
+        }
+
+        // 2. Deleta o registro do banco de dados
+        $stmt_delete = $conexao->prepare("DELETE FROM produto_imagens WHERE id = ?");
+        $stmt_delete->bind_param("i", $id_imagem);
+        if ($stmt_delete->execute()) {
+            header("Location: editar_produto.php?id=$id_produto&img_sucesso=1");
+        } else {
+            header("Location: editar_produto.php?id=$id_produto&img_erro=1");
         }
         exit();
     }

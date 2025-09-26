@@ -27,12 +27,21 @@ $colecoes_atuais_stmt->bind_param("i", $id);
 $colecoes_atuais_stmt->execute();
 $result_colecoes_atuais = $colecoes_atuais_stmt->get_result();
 $colecoes_atuais = [];
+// Busca as imagens adicionais
+$imagens_stmt = $conexao->prepare("SELECT id, caminho_imagem FROM produto_imagens WHERE produto_id = ?");
+$imagens_stmt->bind_param("i", $id);
+$imagens_stmt->execute();
+$imagens_adicionais = $imagens_stmt->get_result();
+
 while ($row = $result_colecoes_atuais->fetch_assoc()) {
     $colecoes_atuais[] = $row['colecao_id'];
 }
 ?>
 
 <h2>Editar Produto</h2>
+
+<?php if(isset($_GET['img_sucesso'])) echo "<p class='success'>Imagem excluída com sucesso!</p>"; ?>
+<?php if(isset($_GET['img_erro'])) echo "<p class='error'>Erro ao excluir imagem.</p>"; ?>
 
 <div class="form-container">
     <form action="acoes_produto.php?acao=editar" method="POST" enctype="multipart/form-data">
@@ -80,6 +89,23 @@ while ($row = $result_colecoes_atuais->fetch_assoc()) {
         <label for="imagem">Trocar Imagem (opcional):</label>
         <input type="file" name="imagem">
         <input type="hidden" name="imagem_antiga" value="<?php echo htmlspecialchars($produto['imagem']); ?>">
+
+        <hr style="grid-column: 1 / -1; border-top: 1px solid #eee; margin: 20px 0;">
+
+        <h4 style="grid-column: 1 / -1; margin-top: 0;">Imagens Adicionais</h4>
+        <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+            <?php while($img = $imagens_adicionais->fetch_assoc()): ?>
+                <div style="position: relative; border: 1px solid #ccc; padding: 5px;">
+                    <img src="../assets/uploads/<?php echo htmlspecialchars($img['caminho_imagem']); ?>" width="100">
+                    <a href="acoes_produto.php?acao=excluir_imagem&id_imagem=<?php echo $img['id']; ?>&id_produto=<?php echo $id; ?>"
+                       onclick="return confirm('Tem certeza que deseja excluir esta imagem?');"
+                       style="position: absolute; top: 0; right: 0; background: red; color: white; text-decoration: none; padding: 2px 5px; font-weight: bold;">X</a>
+                </div>
+            <?php endwhile; ?>
+        </div>
+        
+        <label for="imagens_adicionais">Adicionar Novas Imagens:</label>
+        <input type="file" id="imagens_adicionais" name="imagens_adicionais[]" multiple>
 
         <button type="submit">Salvar Alterações</button>
         <a href="gerenciar_produtos.php" style="margin-left: 10px;">Cancelar</a>
