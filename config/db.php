@@ -7,7 +7,7 @@ if (session_status() == PHP_SESSION_NONE) {
 // Definições do Banco de Dados
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
-define('DB_PASSWORD', 'P@$$w0rd');
+define('DB_PASSWORD', '');
 define('DB_NAME', 'rubye_db');
 
 // Criar a conexão
