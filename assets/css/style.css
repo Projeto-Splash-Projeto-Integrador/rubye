@@ -788,3 +788,14 @@ a {
     height: auto;
     object-fit: contain;
 }
+
+/* Estilo para a mensagem de "Fora de Estoque" na página do produto */
+.out-of-stock-message {
+    padding: 18px;
+    background-color: #f8f8f8;
+    border: 1px solid var(--border-color);
+    text-align: center;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #999;
+}

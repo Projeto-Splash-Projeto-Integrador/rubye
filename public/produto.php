@@ -66,16 +66,22 @@ while ($img = $resultado_imgs->fetch_assoc()) {
             <p><?php echo nl2br(htmlspecialchars($produto['descricao'])); ?></p>
         </div>
         
-        <form action="carrinho_acoes.php?acao=adicionar" method="POST" class="form-add-to-cart">
-            <input type="hidden" name="id_produto" value="<?php echo $produto['id']; ?>">
-            
-            <div class="quantity-selector">
-                <label for="quantidade">Quantidade:</label>
-                <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="<?php echo $produto['estoque']; ?>">
-            </div>
+        <div class="form-add-to-cart">
+            <?php if ($produto['estoque'] > 0): ?>
+            <form action="carrinho_acoes.php?acao=adicionar" method="POST">
+                <input type="hidden" name="id_produto" value="<?php echo $produto['id']; ?>">
 
-            <button type="submit" class="btn-add-to-cart">Adicionar ao Carrinho</button>
-        </form>
+                <div class="quantity-selector">
+                    <label for="quantidade">Quantidade:</label>
+                <input type="number" id="quantidade" name="quantidade" value="1" min="1" max="<?php echo $produto['estoque']; ?>">
+                </div>
+
+                <button type="submit" class="btn-add-to-cart">Adicionar ao Carrinho</button>
+            </form>
+            <?php else: ?>
+                <p class="out-of-stock-message">Fora de Estoque</p>
+            <?php endif; ?>
+        </div>
     </div>
 </div>
 
