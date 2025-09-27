@@ -6,23 +6,6 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     die("Acesso negado.");
 }
 
-// LÓGICA PARA PROCESSAR MÚLTIPLOS UPLOADS
-function processarImagensAdicionais($conexao, $produto_id) {
-    if (isset($_FILES['imagens_adicionais']) && !empty($_FILES['imagens_adicionais']['name'][0])) {
-        $diretorio_upload = '../assets/uploads/';
-        $stmt_img = $conexao->prepare("INSERT INTO produto_imagens (produto_id, caminho_imagem) VALUES (?, ?)");
-        
-        foreach ($_FILES['imagens_adicionais']['tmp_name'] as $key => $tmp_name) {
-            if ($_FILES['imagens_adicionais']['error'][$key] === UPLOAD_ERR_OK) {
-                $extensao = pathinfo($_FILES['imagens_adicionais']['name'][$key], PATHINFO_EXTENSION);
-                $imagem_nome = 'prod_' . uniqid() . '.' . $extensao;
-                move_uploaded_file($tmp_name, $diretorio_upload . $imagem_nome);
-                $stmt_img->bind_param("is", $produto_id, $imagem_nome);
-                $stmt_img->execute();
-            }
-        }
-    }
-}
 
 // Garante que a mensagem de alerta de uma ação anterior seja limpa
 unset($_SESSION['bulk_alert_message']);
@@ -112,96 +95,140 @@ if (isset($_GET['acao'])) {
     }
 
     // --- AÇÃO: ADICIONAR PRODUTO ---
-    elseif ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
-        $conexao->begin_transaction();
-        try {
-            $nome = $_POST['nome'];
-            $descricao = $_POST['descricao'];
-            $preco = str_replace(',', '.', $_POST['preco']);
-            $estoque = $_POST['estoque'];
-            $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
-            $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
-            $imagem_nome = 'default.jpg';
-
-            if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
-                $diretorio_upload = '../assets/uploads/';
-                $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
-                $imagem_nome = uniqid() . '.' . $extensao;
-                if (!move_uploaded_file($_FILES['imagem']['tmp_name'], $diretorio_upload . $imagem_nome)) {
-                    throw new Exception("Erro ao fazer upload da imagem.");
-                }
-            }
-            
-            $stmt = $conexao->prepare("INSERT INTO produtos (nome, descricao, preco, estoque, categoria_id, imagem) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssdiis", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome);
-            $stmt->execute();
-            $produto_id = $conexao->insert_id;
-            processarImagensAdicionais($conexao, $produto_id);
-
-            if (!empty($colecoes)) {
-                $stmt_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
-                foreach ($colecoes as $colecao_id) {
-                    $stmt_colecao->bind_param("ii", $produto_id, $colecao_id);
-                    $stmt_colecao->execute();
-                }
-            }
-            $conexao->commit();
-            header("Location: gerenciar_produtos.php?sucesso=1");
-        } catch (Exception $e) {
-            $conexao->rollback();
-            header("Location: gerenciar_produtos.php?erro=1");
-        }
+    // --- AÇÃO: ADICIONAR PRODUTO (COM LÓGICA DE IMAGEM UNIFICADA) ---
+elseif ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
+        header("Location: gerenciar_produtos.php?erro=imagem_obrigatoria");
         exit();
     }
+
+    $conexao->begin_transaction();
+    try {
+        $diretorio_upload = '../assets/uploads/';
+        $extensao = pathinfo($_FILES['imagens']['name'][0], PATHINFO_EXTENSION);
+        $imagem_principal_nome = 'prod_' . uniqid() . '.' . $extensao;
+        if (!move_uploaded_file($_FILES['imagens']['tmp_name'][0], $diretorio_upload . $imagem_principal_nome)) {
+            throw new Exception("Erro ao fazer upload da imagem principal.");
+        }
+
+        $nome = $_POST['nome'];
+        $descricao = $_POST['descricao'];
+        $preco = str_replace(',', '.', $_POST['preco']);
+        $estoque = $_POST['estoque'];
+        $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
+        $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
+
+        $stmt = $conexao->prepare("INSERT INTO produtos (nome, descricao, preco, estoque, categoria_id, imagem) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssdiis", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_principal_nome);
+        $stmt->execute();
+        $produto_id = $conexao->insert_id;
+
+        if (count($_FILES['imagens']['name']) > 1) {
+            $stmt_img = $conexao->prepare("INSERT INTO produto_imagens (produto_id, caminho_imagem) VALUES (?, ?)");
+            for ($i = 1; $i < count($_FILES['imagens']['name']); $i++) {
+                if ($_FILES['imagens']['error'][$i] === UPLOAD_ERR_OK) {
+                    $ext = pathinfo($_FILES['imagens']['name'][$i], PATHINFO_EXTENSION);
+                    $img_add_nome = 'prod_' . uniqid() . '.' . $ext;
+                    move_uploaded_file($_FILES['imagens']['tmp_name'][$i], $diretorio_upload . $img_add_nome);
+                    $stmt_img->bind_param("is", $produto_id, $img_add_nome);
+                    $stmt_img->execute();
+                }
+            }
+        }
+
+        if (!empty($colecoes)) {
+            $stmt_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
+            foreach ($colecoes as $colecao_id) {
+                $stmt_colecao->bind_param("ii", $produto_id, $colecao_id);
+                $stmt_colecao->execute();
+            }
+        }
+
+        $conexao->commit();
+        header("Location: gerenciar_produtos.php?sucesso=1");
+    } catch (Exception $e) {
+        $conexao->rollback();
+        header("Location: gerenciar_produtos.php?erro=1");
+    }
+    exit();
+}
 
     // --- AÇÃO: EDITAR PRODUTO ---
-    elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
-        $conexao->begin_transaction();
-        try {
-            $id = (int)$_POST['id'];
-            processarImagensAdicionais($conexao, $id);
-            $nome = $_POST['nome'];
-            $descricao = $_POST['descricao'];
-            $preco = str_replace(['.', ','], ['', '.'], $_POST['preco']);
-            $estoque = $_POST['estoque'];
-            $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
-            $imagem_antiga = $_POST['imagem_antiga'];
-            $imagem_nome = $imagem_antiga;
-            $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
+    // --- AÇÃO: EDITAR PRODUTO (COM LÓGICA DE IMAGEM UNIFICADA) ---
+// --- AÇÃO: EDITAR PRODUTO (COM LÓGICA DE IMAGEM UNIFICADA) ---
+elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
+    $conexao->begin_transaction();
+    try {
+        $id = (int)$_POST['id'];
+        $imagem_antiga = $_POST['imagem_antiga'];
+        $imagem_nome_principal = $imagem_antiga;
 
-            if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
-                $diretorio_upload = '../assets/uploads/';
-                if ($imagem_antiga != 'default.jpg' && file_exists($diretorio_upload . $imagem_antiga)) {
-                    unlink($diretorio_upload . $imagem_antiga);
-                }
-                $extensao = pathinfo($_FILES['imagem']['name'], PATHINFO_EXTENSION);
-                $imagem_nome = uniqid() . '.' . $extensao;
-                move_uploaded_file($_FILES['imagem']['tmp_name'], $diretorio_upload . $imagem_nome);
+        // Se novas imagens foram enviadas...
+        if (isset($_FILES['imagens']) && !empty($_FILES['imagens']['name'][0])) {
+            $diretorio_upload = '../assets/uploads/';
+
+            // 1. Processa a primeira imagem como a nova capa
+            $ext_principal = pathinfo($_FILES['imagens']['name'][0], PATHINFO_EXTENSION);
+            $imagem_nome_principal = 'prod_' . uniqid() . '.' . $ext_principal;
+            if (!move_uploaded_file($_FILES['imagens']['tmp_name'][0], $diretorio_upload . $imagem_nome_principal)) {
+                throw new Exception("Erro ao atualizar imagem principal.");
+            }
+            // Deleta a imagem de capa antiga do servidor
+            if (!empty($imagem_antiga) && file_exists($diretorio_upload . $imagem_antiga)) {
+                unlink($diretorio_upload . $imagem_antiga);
             }
 
-            $stmt_produto = $conexao->prepare("UPDATE produtos SET nome = ?, descricao = ?, preco = ?, estoque = ?, categoria_id = ?, imagem = ? WHERE id = ?");
-            $stmt_produto->bind_param("ssdiisi", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome, $id);
-            $stmt_produto->execute();
-
-            $stmt_delete_colecao = $conexao->prepare("DELETE FROM produto_colecao WHERE produto_id = ?");
-            $stmt_delete_colecao->bind_param("i", $id);
-            $stmt_delete_colecao->execute();
-
-            if (!empty($colecoes)) {
-                $stmt_insert_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
-                foreach ($colecoes as $colecao_id) {
-                    $stmt_insert_colecao->bind_param("ii", $id, $colecao_id);
-                    $stmt_insert_colecao->execute();
+            // 2. Processa as imagens restantes como adicionais
+            if (count($_FILES['imagens']['name']) > 1) {
+                $stmt_img = $conexao->prepare("INSERT INTO produto_imagens (produto_id, caminho_imagem) VALUES (?, ?)");
+                for ($i = 1; $i < count($_FILES['imagens']['name']); $i++) {
+                    if ($_FILES['imagens']['error'][$i] === UPLOAD_ERR_OK) {
+                        $ext_add = pathinfo($_FILES['imagens']['name'][$i], PATHINFO_EXTENSION);
+                        $img_add_nome = 'prod_' . uniqid() . '.' . $ext_add;
+                        move_uploaded_file($_FILES['imagens']['tmp_name'][$i], $diretorio_upload . $img_add_nome);
+                        $stmt_img->bind_param("is", $id, $img_add_nome);
+                        $stmt_img->execute();
+                    }
                 }
             }
-            $conexao->commit();
-            header("Location: gerenciar_produtos.php?sucesso=2");
-        } catch (Exception $e) {
-            $conexao->rollback();
-            header("Location: gerenciar_produtos.php?erro=2");
         }
-        exit();
+
+        // Atualiza o resto dos dados do produto
+        $nome = $_POST['nome'];
+        $descricao = $_POST['descricao'];
+        $preco = str_replace(['.', ','], ['', '.'], $_POST['preco']);
+        $estoque = $_POST['estoque'];
+        $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
+        $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
+
+        // Atualiza a tabela produtos, incluindo a nova imagem principal se houver
+        $stmt_produto = $conexao->prepare("UPDATE produtos SET nome = ?, descricao = ?, preco = ?, estoque = ?, categoria_id = ?, imagem = ? WHERE id = ?");
+        $stmt_produto->bind_param("ssdiisi", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome_principal, $id);
+        $stmt_produto->execute();
+
+        // Lógica de coleções (permanece a mesma)
+        $stmt_delete_colecao = $conexao->prepare("DELETE FROM produto_colecao WHERE produto_id = ?");
+        $stmt_delete_colecao->bind_param("i", $id);
+        $stmt_delete_colecao->execute();
+
+        if (!empty($colecoes)) {
+            $stmt_insert_colecao = $conexao->prepare("INSERT INTO produto_colecao (produto_id, colecao_id) VALUES (?, ?)");
+            foreach ($colecoes as $colecao_id) {
+                $stmt_insert_colecao->bind_param("ii", $id, $colecao_id);
+                $stmt_insert_colecao->execute();
+            }
+        }
+
+        $conexao->commit();
+        header("Location: gerenciar_produtos.php?sucesso=2");
+    } catch (Exception $e) {
+        $conexao->rollback();
+        // Para depuração: error_log($e->getMessage());
+        header("Location: editar_produto.php?id=$id&erro=2");
     }
+    exit();
+}
+
     
     // --- NOVA AÇÃO: EXCLUIR IMAGEM ADICIONAL ---
     elseif ($acao == 'excluir_imagem' && isset($_GET['id_imagem'])) {

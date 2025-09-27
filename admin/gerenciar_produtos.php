@@ -99,8 +99,8 @@ if (isset($_SESSION['bulk_alert_message'])) {
             ?>
         </select>
         
-        <label for="imagens_adicionais">Imagens Adicionais (segure Ctrl para selecionar várias):</label>
-        <input type="file" id="imagens_adicionais" name="imagens_adicionais[]" multiple>
+        <label for="imagens">Imagens (a primeira selecionada será a capa):</label>
+        <input type="file" id="imagens" name="imagens[]" multiple required>
 
         <button type="submit">Salvar Produto</button>
     </form>

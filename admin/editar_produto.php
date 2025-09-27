@@ -83,29 +83,31 @@ while ($row = $result_colecoes_atuais->fetch_assoc()) {
             ?>
         </select>
 
-        <label>Imagem Atual:</label>
-        <img src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="Imagem atual" width="100">
-        
-        <label for="imagem">Trocar Imagem (opcional):</label>
-        <input type="file" name="imagem">
-        <input type="hidden" name="imagem_antiga" value="<?php echo htmlspecialchars($produto['imagem']); ?>">
+        <label>Imagem de Capa Atual:</label>
+<img src="../assets/uploads/<?php echo htmlspecialchars($produto['imagem']); ?>" alt="Imagem atual" width="100" style="margin-bottom: 20px;">
+<input type="hidden" name="imagem_antiga" value="<?php echo htmlspecialchars($produto['imagem']); ?>">
 
-        <hr style="grid-column: 1 / -1; border-top: 1px solid #eee; margin: 20px 0;">
+<hr style="grid-column: 1 / -1; border-top: 1px solid #eee; margin: 20px 0;">
 
-        <h4 style="grid-column: 1 / -1; margin-top: 0;">Imagens Adicionais</h4>
-        <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
-            <?php while($img = $imagens_adicionais->fetch_assoc()): ?>
-                <div style="position: relative; border: 1px solid #ccc; padding: 5px;">
-                    <img src="../assets/uploads/<?php echo htmlspecialchars($img['caminho_imagem']); ?>" width="100">
-                    <a href="acoes_produto.php?acao=excluir_imagem&id_imagem=<?php echo $img['id']; ?>&id_produto=<?php echo $id; ?>"
-                       onclick="return confirm('Tem certeza que deseja excluir esta imagem?');"
-                       style="position: absolute; top: 0; right: 0; background: red; color: white; text-decoration: none; padding: 2px 5px; font-weight: bold;">X</a>
-                </div>
-            <?php endwhile; ?>
+<h4 style="grid-column: 1 / -1; margin-top: 0;">Imagens Adicionais</h4>
+<div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+    <?php 
+    // Reinicia o ponteiro do resultado para o loop
+    $imagens_adicionais->data_seek(0); 
+    while($img = $imagens_adicionais->fetch_assoc()): 
+    ?>
+        <div style="position: relative; border: 1px solid #ccc; padding: 5px;">
+            <img src="../assets/uploads/<?php echo htmlspecialchars($img['caminho_imagem']); ?>" width="100">
+            <a href="acoes_produto.php?acao=excluir_imagem&id_imagem=<?php echo $img['id']; ?>&id_produto=<?php echo $id; ?>"
+               onclick="return confirm('Tem certeza que deseja excluir esta imagem?');"
+               style="position: absolute; top: 0; right: 0; background: red; color: white; text-decoration: none; padding: 2px 5px; font-weight: bold;">X</a>
         </div>
-        
-        <label for="imagens_adicionais">Adicionar Novas Imagens:</label>
-        <input type="file" id="imagens_adicionais" name="imagens_adicionais[]" multiple>
+    <?php endwhile; ?>
+</div>
+
+<label for="imagens">Adicionar/Trocar Imagens (opcional):</label>
+<input type="file" id="imagens" name="imagens[]" multiple>
+<p style="grid-column: 1 / -1; font-size: 0.8em; color: #666;">Se enviar novas imagens, a primeira substituirá a capa atual. As demais serão adicionadas à galeria.</p>
 
         <button type="submit">Salvar Alterações</button>
         <a href="gerenciar_produtos.php" style="margin-left: 10px;">Cancelar</a>
