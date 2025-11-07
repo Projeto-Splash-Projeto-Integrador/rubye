@@ -67,8 +67,8 @@ while ($img = $resultado_imgs->fetch_assoc()) {
         </div>
         
         <div class="form-add-to-cart">
+            <form action="carrinho_acoes.php?acao=adicionar" method="POST" class="form-add-to-cart">
             <?php if ($produto['estoque'] > 0): ?>
-            <form action="carrinho_acoes.php?acao=adicionar" method="POST">
                 <input type="hidden" name="id_produto" value="<?php echo $produto['id']; ?>">
 
                 <div class="quantity-selector">
