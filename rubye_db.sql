@@ -30,11 +30,12 @@ USE `rubye_db`;
 --
 -- Estrutura para tabela `categorias`
 --
-
 CREATE TABLE `categorias` (
-  `id` int(11) NOT NULL,
-  `nome` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nome_unico` (`nome`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=5;
 
 --
 -- Despejando dados para a tabela `categorias`
@@ -51,12 +52,12 @@ INSERT INTO `categorias` (`id`, `nome`) VALUES
 --
 -- Estrutura para tabela `colecoes`
 --
-
 CREATE TABLE `colecoes` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(255) NOT NULL,
-  `imagem` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `imagem` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=3;
 
 --
 -- Despejando dados para a tabela `colecoes`
@@ -71,55 +72,60 @@ INSERT INTO `colecoes` (`id`, `nome`, `imagem`) VALUES
 --
 -- Estrutura para tabela `pedidos`
 --
-
 CREATE TABLE `pedidos` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `usuario_id` int(11) NOT NULL,
   `total` decimal(10,2) NOT NULL,
   `status` enum('Pedido Recebido','Pagamento em Análise','Pagamento Confirmado','Em Separação','Enviado','Em rota de entrega','Entregue','Pedido Cancelado') NOT NULL DEFAULT 'Pedido Recebido',
-  `data_pedido` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `data_pedido` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `fk_usuario` (`usuario_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=7;
 
 -- --------------------------------------------------------
 
 --
 -- Estrutura para tabela `pedido_itens`
 --
-
 CREATE TABLE `pedido_itens` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `pedido_id` int(11) NOT NULL,
   `produto_id` int(11) NOT NULL,
   `quantidade` int(11) NOT NULL,
-  `preco_unitario` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `preco_unitario` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_pedido` (`pedido_id`),
+  KEY `fk_produto` (`produto_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=7;
 
 -- --------------------------------------------------------
 
 --
 -- Estrutura para tabela `produtos`
 --
-
 CREATE TABLE `produtos` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(255) NOT NULL,
   `descricao` text DEFAULT NULL,
   `preco` decimal(10,2) NOT NULL,
   `imagem` varchar(255) NOT NULL,
   `estoque` int(11) NOT NULL DEFAULT 0,
   `categoria_id` int(11) DEFAULT NULL,
-  `status` enum('ativo','inativo') NOT NULL DEFAULT 'ativo'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `status` enum('ativo','inativo') NOT NULL DEFAULT 'ativo',
+  PRIMARY KEY (`id`),
+  KEY `fk_categoria` (`categoria_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=12;
 
 -- --------------------------------------------------------
 
 --
 -- Estrutura para tabela `produto_colecao`
 --
-
 CREATE TABLE `produto_colecao` (
   `produto_id` int(11) NOT NULL,
-  `colecao_id` int(11) NOT NULL
+  `colecao_id` int(11) NOT NULL,
+  PRIMARY KEY (`produto_id`,`colecao_id`),
+  KEY `fk_colecao` (`colecao_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -127,27 +133,29 @@ CREATE TABLE `produto_colecao` (
 --
 -- Estrutura para tabela `produto_imagens`
 --
-
 CREATE TABLE `produto_imagens` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `produto_id` int(11) NOT NULL,
-  `caminho_imagem` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `caminho_imagem` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_produto_imagens_produto` (`produto_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=15;
 
 -- --------------------------------------------------------
 
 --
 -- Estrutura para tabela `usuarios`
 --
-
 CREATE TABLE `usuarios` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `senha` varchar(255) NOT NULL,
   `role` enum('cliente','admin') NOT NULL DEFAULT 'cliente',
-  `data_cadastro` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `data_cadastro` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_unico` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci AUTO_INCREMENT=5;
 
 --
 -- Despejando dados para a tabela `usuarios`
@@ -160,63 +168,11 @@ INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha`, `role`, `data_cadastro`)
 --
 -- Índices para tabelas despejadas
 --
-
-ALTER TABLE `categorias`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nome_unico` (`nome`);
-
-ALTER TABLE `colecoes`
-  ADD PRIMARY KEY (`id`);
-
-ALTER TABLE `pedidos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_usuario` (`usuario_id`);
-
-ALTER TABLE `pedido_itens`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_pedido` (`pedido_id`),
-  ADD KEY `fk_produto` (`produto_id`);
-
-ALTER TABLE `produtos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_categoria` (`categoria_id`);
-
-ALTER TABLE `produto_colecao`
-  ADD PRIMARY KEY (`produto_id`,`colecao_id`),
-  ADD KEY `fk_colecao` (`colecao_id`);
-
-ALTER TABLE `produto_imagens`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_produto_imagens_produto` (`produto_id`);
-
-ALTER TABLE `usuarios`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email_unico` (`email`);
-
---
--- AUTO_INCREMENT para tabelas despejadas
+-- (Todos os comandos de PRIMARY KEY e MODIFY foram movidos para cima,
+-- dentro dos comandos CREATE TABLE)
 --
 
-ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
-ALTER TABLE `colecoes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
-ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
-ALTER TABLE `pedido_itens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
-ALTER TABLE `produtos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
-
-ALTER TABLE `produto_imagens`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
-
-ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+-- --------------------------------------------------------
 
 --
 -- Restrições para tabelas despejadas
