@@ -1,20 +1,19 @@
 <?php
 require_once '../config/db.php';
 
-// Verificação de segurança: Apenas administradores podem executar estas ações
+
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     die("Acesso negado.");
 }
 
 
-// Garante que a mensagem de alerta de uma ação anterior seja limpa
 unset($_SESSION['bulk_alert_message']);
 
-// Verifica se uma ação foi definida via GET
+
 if (isset($_GET['acao'])) {
     $acao = $_GET['acao'];
 
-    // --- AÇÃO: ATUALIZAÇÃO EM MASSA (COM VALIDAÇÃO AVANÇADA) ---
+
     if ($acao == 'bulk_update' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!isset($_POST['produto_ids']) || empty($_POST['produto_ids']) || !isset($_POST['bulk_action']) || empty($_POST['bulk_action'])) {
             header("Location: gerenciar_produtos.php");
@@ -28,7 +27,7 @@ if (isset($_GET['acao'])) {
         $produtos_afetados = 0;
         $produtos_ignorados_nomes = [];
 
-        // --- Lógica para Mudar Status ---
+
         if ($bulk_action == 'ativar' || $bulk_action == 'desativar') {
             $novo_status = ($bulk_action == 'ativar') ? 'ativo' : 'inativo';
             
@@ -52,12 +51,12 @@ if (isset($_GET['acao'])) {
             }
         }
         
-        // --- Lógica para Adicionar à Coleção ---
+
         elseif (strpos($bulk_action, 'add_collection_') === 0) {
             $collection_id = (int)str_replace('add_collection_', '', $bulk_action);
             
             $produtos_para_adicionar = [];
-            // Verifica cada produto individualmente para evitar erro de chave duplicada
+
             foreach ($produto_ids as $produto_id) {
                 $stmt_check = $conexao->prepare("SELECT COUNT(*) as total FROM produto_colecao WHERE produto_id = ? AND colecao_id = ?");
                 $stmt_check->bind_param("ii", $produto_id, $collection_id);
@@ -84,7 +83,7 @@ if (isset($_GET['acao'])) {
             }
         }
 
-        // --- Prepara a mensagem de alerta para o usuário ---
+
         if (!empty($produtos_ignorados_nomes)) {
             $nomes = implode(', ', $produtos_ignorados_nomes);
             $_SESSION['bulk_alert_message'] = "Ação concluída. Os seguintes produtos foram ignorados pois já estavam no estado desejado: $nomes.";
@@ -94,8 +93,7 @@ if (isset($_GET['acao'])) {
         exit();
     }
 
-    // --- AÇÃO: ADICIONAR PRODUTO ---
-    // --- AÇÃO: ADICIONAR PRODUTO (COM LÓGICA DE IMAGEM UNIFICADA) ---
+
 elseif ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     if (!isset($_FILES['imagens']) || empty($_FILES['imagens']['name'][0])) {
         header("Location: gerenciar_produtos.php?erro=imagem_obrigatoria");
@@ -153,9 +151,6 @@ elseif ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
 }
 
-    // --- AÇÃO: EDITAR PRODUTO ---
-    // --- AÇÃO: EDITAR PRODUTO (COM LÓGICA DE IMAGEM UNIFICADA) ---
-// --- AÇÃO: EDITAR PRODUTO (COM LÓGICA DE IMAGEM UNIFICADA) ---
 elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $conexao->begin_transaction();
     try {
@@ -163,22 +158,21 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $imagem_antiga = $_POST['imagem_antiga'];
         $imagem_nome_principal = $imagem_antiga;
 
-        // Se novas imagens foram enviadas...
+
         if (isset($_FILES['imagens']) && !empty($_FILES['imagens']['name'][0])) {
             $diretorio_upload = '../assets/uploads/';
 
-            // 1. Processa a primeira imagem como a nova capa
             $ext_principal = pathinfo($_FILES['imagens']['name'][0], PATHINFO_EXTENSION);
             $imagem_nome_principal = 'prod_' . uniqid() . '.' . $ext_principal;
             if (!move_uploaded_file($_FILES['imagens']['tmp_name'][0], $diretorio_upload . $imagem_nome_principal)) {
                 throw new Exception("Erro ao atualizar imagem principal.");
             }
-            // Deleta a imagem de capa antiga do servidor
+
             if (!empty($imagem_antiga) && file_exists($diretorio_upload . $imagem_antiga)) {
                 unlink($diretorio_upload . $imagem_antiga);
             }
 
-            // 2. Processa as imagens restantes como adicionais
+
             if (count($_FILES['imagens']['name']) > 1) {
                 $stmt_img = $conexao->prepare("INSERT INTO produto_imagens (produto_id, caminho_imagem) VALUES (?, ?)");
                 for ($i = 1; $i < count($_FILES['imagens']['name']); $i++) {
@@ -193,7 +187,7 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
             }
         }
 
-        // Atualiza o resto dos dados do produto
+ 
         $nome = $_POST['nome'];
         $descricao = $_POST['descricao'];
         $preco = str_replace(['.', ','], ['', '.'], $_POST['preco']);
@@ -201,12 +195,12 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $categoria_id = !empty($_POST['categoria_id']) ? $_POST['categoria_id'] : null;
         $colecoes = isset($_POST['colecoes']) ? $_POST['colecoes'] : [];
 
-        // Atualiza a tabela produtos, incluindo a nova imagem principal se houver
+ 
         $stmt_produto = $conexao->prepare("UPDATE produtos SET nome = ?, descricao = ?, preco = ?, estoque = ?, categoria_id = ?, imagem = ? WHERE id = ?");
         $stmt_produto->bind_param("ssdiisi", $nome, $descricao, $preco, $estoque, $categoria_id, $imagem_nome_principal, $id);
         $stmt_produto->execute();
 
-        // Lógica de coleções (permanece a mesma)
+
         $stmt_delete_colecao = $conexao->prepare("DELETE FROM produto_colecao WHERE produto_id = ?");
         $stmt_delete_colecao->bind_param("i", $id);
         $stmt_delete_colecao->execute();
@@ -223,19 +217,17 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         header("Location: gerenciar_produtos.php?sucesso=2");
     } catch (Exception $e) {
         $conexao->rollback();
-        // Para depuração: error_log($e->getMessage());
+
         header("Location: editar_produto.php?id=$id&erro=2");
     }
     exit();
 }
 
     
-    // --- NOVA AÇÃO: EXCLUIR IMAGEM ADICIONAL ---
+
     elseif ($acao == 'excluir_imagem' && isset($_GET['id_imagem'])) {
         $id_imagem = (int)$_GET['id_imagem'];
-        $id_produto = (int)$_GET['id_produto']; // Usado para redirecionar de volta
-
-        // 1. Busca o caminho da imagem para poder deletar o arquivo
+        $id_produto = (int)$_GET['id_produto']; 
         $stmt_get = $conexao->prepare("SELECT caminho_imagem FROM produto_imagens WHERE id = ?");
         $stmt_get->bind_param("i", $id_imagem);
         $stmt_get->execute();
@@ -244,11 +236,10 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($resultado) {
             $caminho_arquivo = '../assets/uploads/' . $resultado['caminho_imagem'];
             if (file_exists($caminho_arquivo)) {
-                unlink($caminho_arquivo); // Deleta o arquivo do servidor
+                unlink($caminho_arquivo); 
             }
         }
 
-        // 2. Deleta o registro do banco de dados
         $stmt_delete = $conexao->prepare("DELETE FROM produto_imagens WHERE id = ?");
         $stmt_delete->bind_param("i", $id_imagem);
         if ($stmt_delete->execute()) {
@@ -259,7 +250,6 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // --- AÇÃO: DESATIVAR PRODUTO ---
     elseif ($acao == 'desativar' && isset($_GET['id'])) {
         $id = (int)$_GET['id'];
         $stmt = $conexao->prepare("UPDATE produtos SET status = 'inativo' WHERE id = ?");
@@ -272,7 +262,7 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    // --- AÇÃO: REATIVAR PRODUTO ---
+
     elseif ($acao == 'reativar' && isset($_GET['id'])) {
         $id = (int)$_GET['id'];
         $stmt = $conexao->prepare("UPDATE produtos SET status = 'ativo' WHERE id = ?");
@@ -286,7 +276,7 @@ elseif ($acao == 'editar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// Redirecionamento padrão caso nenhuma ação seja encontrada
+
 header("Location: gerenciar_produtos.php");
 exit();
 ?>

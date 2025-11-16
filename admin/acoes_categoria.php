@@ -1,12 +1,11 @@
 <?php
 require_once '../config/db.php';
 
-// Verificação de segurança: Apenas administradores podem executar estas ações
+
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
     die("Acesso negado.");
 }
 
-// Verifica se uma ação foi definida via GET
 if (isset($_GET['acao'])) {
     $acao = $_GET['acao'];
 
@@ -40,8 +39,6 @@ if (isset($_GET['acao'])) {
     // --- AÇÃO: EXCLUIR CATEGORIA ---
     elseif ($acao == 'excluir' && isset($_GET['id'])) {
         $id = $_GET['id'];
-        // NOTA: A constraint 'ON DELETE SET NULL' na tabela 'produtos' fará com que 
-        // o campo 'categoria_id' dos produtos associados se torne NULL.
         $stmt = $conexao->prepare("DELETE FROM categorias WHERE id = ?");
         $stmt->bind_param("i", $id);
         $stmt->execute();

@@ -1,10 +1,10 @@
 <?php
-// Inclui o mesmo ficheiro de configuração que o sistema de login usa.
+
 require_once '../config/db.php';
 
 echo "<h1>Teste Final - Parte 1</h1>";
 
-// Vamos criar manualmente uma sessão de admin válida.
+
 $_SESSION['usuario_id'] = 99;
 $_SESSION['usuario_nome'] = 'Utilizador de Teste';
 $_SESSION['usuario_role'] = 'admin';

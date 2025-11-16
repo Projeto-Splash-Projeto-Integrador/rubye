@@ -34,11 +34,11 @@ if (isset($_GET['acao'])) {
         $imagem_antiga = $_POST['imagem_antiga'];
         $imagem_nome = $imagem_antiga;
 
-        // Se uma nova imagem foi enviada, processa o upload
+
         if (isset($_FILES['imagem']) && $_FILES['imagem']['error'] == 0) {
             $diretorio_upload = '../assets/uploads/';
             
-            // Apaga a imagem antiga se ela existir e não for a default
+
             if (!empty($imagem_antiga) && file_exists($diretorio_upload . $imagem_antiga)) {
                 unlink($diretorio_upload . $imagem_antiga);
             }
@@ -51,14 +51,13 @@ if (isset($_GET['acao'])) {
         $stmt = $conexao->prepare("UPDATE colecoes SET nome = ?, imagem = ? WHERE id = ?");
         $stmt->bind_param("ssi", $nome, $imagem_nome, $id);
         $stmt->execute();
-        header("Location: gerenciar_colecoes.php?sucesso=3"); // Mensagem de sucesso para edição
+        header("Location: gerenciar_colecoes.php?sucesso=3");
         exit();
     }
 
     // --- AÇÃO: EXCLUIR COLEÇÃO ---
     elseif ($acao == 'excluir' && isset($_GET['id'])) {
         $id = (int)$_GET['id'];
-        // Lógica para apagar a imagem do servidor antes de deletar do DB
         $stmt_get = $conexao->prepare("SELECT imagem FROM colecoes WHERE id = ?");
         $stmt_get->bind_param("i", $id);
         $stmt_get->execute();

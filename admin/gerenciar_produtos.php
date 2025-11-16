@@ -1,14 +1,14 @@
 <?php include 'partials/header.php'; ?>
 
 <style>
-/* Adiciona um destaque visual para o filtro ativo */
+
 .filters-container a.active {
     font-weight: bold;
     text-decoration: underline;
     color: #000;
 }
 
-/* Estilos para o formulário de ações em massa */
+
 .bulk-actions-container {
     padding: 15px;
     background-color: #f8f8f8;
@@ -24,7 +24,7 @@
     border-radius: 4px;
 }
 
-/* Estilo para a caixa de alerta de produtos ignorados */
+
 .alert-box {
     padding: 15px;
     margin-bottom: 20px;
@@ -39,7 +39,7 @@
 <h2>Gerenciamento de Produtos</h2>
 
 <?php
-// Exibe mensagens de sucesso ou erro
+
 if (isset($_GET['sucesso'])) {
     $sucesso_msgs = [
         '1' => 'Produto adicionado com sucesso!',
@@ -56,10 +56,10 @@ if (isset($_GET['erro'])) {
     echo '<p class="error">Ocorreu um erro ao realizar a ação.</p>';
 }
 
-// Exibe a mensagem de ALERTA com os produtos ignorados, se houver
+
 if (isset($_SESSION['bulk_alert_message'])) {
     echo '<div class="alert-box">' . htmlspecialchars($_SESSION['bulk_alert_message']) . '</div>';
-    unset($_SESSION['bulk_alert_message']); // Limpa a mensagem após exibi-la
+    unset($_SESSION['bulk_alert_message']); 
 }
 ?>
 

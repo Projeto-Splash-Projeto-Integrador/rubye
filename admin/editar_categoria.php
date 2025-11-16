@@ -1,7 +1,6 @@
 <?php 
 include 'partials/header.php';
 
-// Verifica se o ID foi passado e é numérico
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<p class='error'>ID da categoria inválido.</p>";
     include 'partials/footer.php';

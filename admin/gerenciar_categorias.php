@@ -3,7 +3,7 @@
 <h2>Gerenciamento de Categorias</h2>
 
 <?php
-// Exibe mensagens de sucesso ou erro vindas dos scripts de ação
+
 if (isset($_GET['sucesso'])) {
     echo '<p class="success">Ação realizada com sucesso!</p>';
 }

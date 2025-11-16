@@ -1,7 +1,6 @@
 <?php 
 include 'partials/header.php';
 
-// Valida o ID da coleção na URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<p class='error'>ID da coleção inválido.</p>";
     include 'partials/footer.php';

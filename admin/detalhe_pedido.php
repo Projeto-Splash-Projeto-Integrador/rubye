@@ -1,13 +1,13 @@
 <?php 
 include 'partials/header.php';
 
-// Valida o ID do pedido na URL
+
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("ID de pedido inválido.");
 }
 $id_pedido = $_GET['id'];
 
-// Query para buscar os dados do pedido e do cliente
+
 $stmt_pedido = $conexao->prepare("SELECT p.*, u.nome, u.email FROM pedidos p JOIN usuarios u ON p.usuario_id = u.id WHERE p.id = ?");
 $stmt_pedido->bind_param("i", $id_pedido);
 $stmt_pedido->execute();
@@ -17,7 +17,6 @@ if (!$pedido) {
     die("Pedido não encontrado.");
 }
 
-// Query para buscar os itens do pedido
 $stmt_itens = $conexao->prepare("SELECT oi.quantidade, oi.preco_unitario, pr.nome AS nome_produto FROM pedido_itens oi JOIN produtos pr ON oi.produto_id = pr.id WHERE oi.pedido_id = ?");
 $stmt_itens->bind_param("i", $id_pedido);
 $stmt_itens->execute();

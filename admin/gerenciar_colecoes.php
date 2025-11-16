@@ -3,7 +3,7 @@
 <h2>Gerenciar Coleções</h2>
 
 <?php
-// Exibe mensagens de sucesso mais específicas
+
 if (isset($_GET['sucesso'])) {
     $sucesso_msgs = [
         '1' => 'Coleção adicionada com sucesso!',

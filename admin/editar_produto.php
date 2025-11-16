@@ -1,7 +1,7 @@
 <?php
 include 'partials/header.php';
 
-// Valida o ID do produto na URL
+
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<p class='error'>ID do produto inválido.</p>";
     include 'partials/footer.php';
@@ -21,13 +21,13 @@ if (!$produto) {
     exit();
 }
 
-// Busca as coleções já associadas a este produto
+
 $colecoes_atuais_stmt = $conexao->prepare("SELECT colecao_id FROM produto_colecao WHERE produto_id = ?");
 $colecoes_atuais_stmt->bind_param("i", $id);
 $colecoes_atuais_stmt->execute();
 $result_colecoes_atuais = $colecoes_atuais_stmt->get_result();
 $colecoes_atuais = [];
-// Busca as imagens adicionais
+
 $imagens_stmt = $conexao->prepare("SELECT id, caminho_imagem FROM produto_imagens WHERE produto_id = ?");
 $imagens_stmt->bind_param("i", $id);
 $imagens_stmt->execute();
@@ -76,7 +76,7 @@ while ($row = $result_colecoes_atuais->fetch_assoc()) {
             <?php
             $colecoes_result = $conexao->query("SELECT * FROM colecoes ORDER BY nome");
             while ($col = $colecoes_result->fetch_assoc()) {
-                // Verifica se a coleção atual está na lista de coleções do produto
+
                 $selected = in_array($col['id'], $colecoes_atuais) ? 'selected' : '';
                 echo "<option value='{$col['id']}' {$selected}>" . htmlspecialchars($col['nome']) . "</option>";
             }
@@ -92,7 +92,7 @@ while ($row = $result_colecoes_atuais->fetch_assoc()) {
 <h4 style="grid-column: 1 / -1; margin-top: 0;">Imagens Adicionais</h4>
 <div style="grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
     <?php 
-    // Reinicia o ponteiro do resultado para o loop
+
     $imagens_adicionais->data_seek(0); 
     while($img = $imagens_adicionais->fetch_assoc()): 
     ?>
