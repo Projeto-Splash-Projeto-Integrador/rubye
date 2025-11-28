@@ -18,7 +18,7 @@
         <?php
         $titulo_pagina = "Nossos Produtos";
 
-        // SQL base que busca a imagem principal e a de hover
+
         $sql_select_part = "SELECT p.*, (SELECT pi.caminho_imagem FROM produto_imagens pi WHERE pi.produto_id = p.id ORDER BY pi.id ASC LIMIT 1) AS imagem_hover FROM produtos p";
 
         // Filtro por BUSCA

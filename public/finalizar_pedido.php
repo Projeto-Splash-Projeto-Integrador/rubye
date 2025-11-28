@@ -1,7 +1,6 @@
 <?php
 require_once '../config/db.php';
 
-// 1. VERIFICAÇÕES DE SEGURANÇA
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php?erro=login_necessario');
     exit();
@@ -12,11 +11,11 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
     exit();
 }
 
-// 2. LÓGICA DE TRANSAÇÃO NO BANCO DE DADOS
+// LÓGICA DE TRANSAÇÃO
 $conexao->begin_transaction();
 
 try {
-    // Passo A: Buscar preços e estoque atuais no DB e calcular o total
+    
     $ids_produtos = array_keys($_SESSION['carrinho']);
     if (empty($ids_produtos)) {
         throw new Exception("Carrinho vazio após verificação inicial.");
@@ -48,18 +47,14 @@ try {
         $total_pedido += $produto['preco'] * $quantidade_carrinho;
     }
 
-    // Passo B: Inserir o registro principal na tabela 'pedidos'
     $usuario_id = $_SESSION['usuario_id'];
     
     $stmt_pedido = $conexao->prepare("INSERT INTO pedidos (usuario_id, total, status) VALUES (?, ?, 'Pedido Recebido')");
     
-    // ===== CORREÇÃO APLICADA AQUI =====
-    // Os tipos foram corrigidos de "id" para "id" (integer, double)
     $stmt_pedido->bind_param("id", $usuario_id, $total_pedido);
     $stmt_pedido->execute();
     $pedido_id = $conexao->insert_id;
 
-    // Passo C: Inserir cada item do carrinho e atualizar o estoque
     $stmt_item = $conexao->prepare("INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)");
     $stmt_estoque = $conexao->prepare("UPDATE produtos SET estoque = estoque - ? WHERE id = ?");
 
@@ -75,17 +70,14 @@ try {
         $stmt_estoque->execute();
     }
 
-    // Se tudo deu certo, confirma as alterações e limpa o carrinho
     $conexao->commit();
     unset($_SESSION['carrinho']);
     header('Location: minha_conta.php?sucesso=pedido_realizado');
     exit();
 
 } catch (Exception $e) {
-    // Se algo deu errado, desfaz todas as alterações e redireciona com erro
+
     $conexao->rollback();
-    // Opcional: registrar o erro real para depuração
-    // error_log('Erro ao finalizar pedido: ' . $e->getMessage());
     header('Location: carrinho.php?erro=processamento');
     exit();
 }

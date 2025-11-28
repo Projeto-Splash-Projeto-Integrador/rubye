@@ -4,7 +4,6 @@
     <h2>Acesse sua Conta</h2>
     
     <?php
-    // Exibe mensagens de sucesso ou erro
     if (isset($_GET['sucesso']) && $_GET['sucesso'] == 'registrado') {
         echo '<p class="success">Cadastro realizado com sucesso! Faça seu login.</p>';
     }

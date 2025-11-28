@@ -1,7 +1,6 @@
 <?php 
 include 'partials/header.php'; 
 
-// Segurança: Apenas utilizadores logados podem aceder a esta página
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php');
     exit();

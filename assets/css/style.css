@@ -799,3 +799,135 @@ a {
     text-transform: uppercase;
     color: #999;
 }
+
+/* === PÁGINA SOBRE === */
+.about-page {
+    padding: 20px 0;
+}
+
+
+/* --- PÁGINA SOBRE - Seção Hero (Texto + Imagem) --- */
+.about-hero {
+    display: flex;
+    /* MUDANÇA: 'center' alinha os blocos verticalmente pelo meio */
+    align-items: center;
+    /* Mantém o conjunto centralizado horizontalmente na página */
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.about-text {
+    flex: 1;
+    /* Define uma largura para o texto não ficar muito "esparramado" */
+    max-width: 450px;
+    text-align: center;
+}
+
+.about-text h2 {
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 20px;
+    margin-top: 0;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+/* Container da imagem */
+.about-image {
+    flex: 1;
+    /* Garante que a imagem não fique maior que o bloco de texto */
+    max-width: 450px;
+    display: flex;
+    height: auto;
+}
+
+/* A imagem em si */
+.about-image img {
+    width: 100%;
+    /* A altura se ajusta automaticamente para não distorcer */
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+
+/* --- PÁGINA SOBRE - Seção Valores (Cards) --- */
+.about-values {
+    display: flex;
+    /* NOVO: Centraliza os cards horizontalmente na página */
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+    text-align: center;
+    /* Permite que os cards se ajustem em telas menores */
+    flex-wrap: wrap;
+}
+
+.value-card {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    /* MUDANÇA: Padding reduzido para deixar o card mais baixo e compacto */
+    padding: 25px 20px;
+    border-radius: 12px;
+    /* NOVO: Define uma largura ideal e uma máxima para os cards */
+    flex: 1 1 280px;
+    max-width: 320px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    /* Garante que o conteúdo fique centralizado dentro do card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.value-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: var(--primary-color);
+}
+
+.value-card h3 {
+    color: var(--primary-color);
+    /* Margem reduzida */
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+}
+
+.value-card p {
+    /* Fonte ligeiramente menor para ficar mais harmônico */
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.value-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.value-card ul li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95rem;
+}
+
+.value-card ul li:last-child {
+    border-bottom: none;
+}
+
+/* Responsividade para a página Sobre */
+@media (max-width: 768px) {
+    .about-hero {
+        flex-direction: column;
+    }
+    .about-values {
+        flex-direction: column;
+    }
+}

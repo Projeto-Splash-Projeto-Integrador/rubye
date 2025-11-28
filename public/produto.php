@@ -23,10 +23,9 @@ if (!$produto) {
     exit();
 }
 
-// Busca todas as imagens do produto (principal + adicionais)
 $imagens = [];
 if (!empty($produto['imagem'])) {
-    $imagens[] = $produto['imagem']; // Adiciona a imagem principal primeiro
+    $imagens[] = $produto['imagem']; 
 }
 
 $imagens_adicionais_stmt = $conexao->prepare("SELECT caminho_imagem FROM produto_imagens WHERE produto_id = ? ORDER BY id ASC");

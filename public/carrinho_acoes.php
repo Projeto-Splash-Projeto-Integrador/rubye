@@ -1,28 +1,27 @@
 <?php
 require_once '../config/db.php';
 
-// Apenas inicia a sessão se não houver uma ativa.
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Inicializa o carrinho na sessão se não existir
+
 if (!isset($_SESSION['carrinho'])) {
     $_SESSION['carrinho'] = [];
 }
 
-// Função para enviar uma resposta JSON limpa e terminar o script
+
 function json_response($data) {
     header('Content-Type: application/json');
     echo json_encode($data);
     exit();
 }
 
-// Verifica se uma ação foi passada pela URL
+
 if (isset($_GET['acao'])) {
     $acao = $_GET['acao'];
 
-    // --- AÇÃO: ADICIONAR ITEM AO CARRINHO (Via AJAX) ---
+    // ADICIONAR ITEM AO CARRINHO
     if ($acao == 'adicionar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         if (!isset($_POST['id_produto'])) {
             json_response(['success' => false, 'message' => 'ID do produto ausente.']);
@@ -31,7 +30,6 @@ if (isset($_GET['acao'])) {
         $id_produto = (int)$_POST['id_produto'];
         $quantidade = (int)$_POST['quantidade'];
 
-        // Verificação de segurança para garantir que o produto está ativo
         $stmt = $conexao->prepare("SELECT status FROM produtos WHERE id = ?");
         $stmt->bind_param("i", $id_produto);
         $stmt->execute();
@@ -55,7 +53,7 @@ if (isset($_GET['acao'])) {
         ]);
     }
 
-    // --- AÇÃO: ATUALIZAR QUANTIDADE ---
+    // ATUALIZAR QUANTIDADE 
     elseif ($acao == 'atualizar' && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $id_produto = (int)$_POST['id_produto'];
         $quantidade = (int)$_POST['quantidade'];
@@ -71,7 +69,7 @@ if (isset($_GET['acao'])) {
         exit();
     }
     
-    // --- AÇÃO: REMOVER ITEM DO CARRINHO ---
+    // REMOVER ITEM DO CARRINHO
     elseif ($acao == 'remover' && isset($_GET['id'])) {
         $id_produto = (int)$_GET['id'];
         if (isset($_SESSION['carrinho'][$id_produto])) {
@@ -81,7 +79,7 @@ if (isset($_GET['acao'])) {
         exit();
     }
 
-    // --- AÇÃO: LIMPAR CARRINHO ---
+    // LIMPAR CARRINHO 
     elseif ($acao == 'limpar') {
         $_SESSION['carrinho'] = [];
         header('Location: carrinho.php');
@@ -89,7 +87,6 @@ if (isset($_GET['acao'])) {
     }
 }
 
-// Se nenhuma ação válida for encontrada, redireciona para o carrinho para evitar erros.
 header('Location: carrinho.php');
 exit();
 ?>

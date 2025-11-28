@@ -1,13 +1,12 @@
 <?php 
 include 'partials/header.php'; 
 
-// Segurança: Se o utilizador não estiver logado, redireciona para o login
 if (!isset($_SESSION['usuario_id'])) {
     header('Location: login.php?erro=login_necessario');
     exit();
 }
 
-// Se o carrinho estiver vazio, redireciona.
+
 if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
     header('Location: carrinho.php');
     exit();
