@@ -34,12 +34,12 @@ $total_produtos = $result_produtos->fetch_assoc()['total'];
         <div class="card">
             <h3>Faturamento (Pagamentos Confirmados)</h3>
             <p class="stat">R$ <?php echo number_format($faturamento, 2, ',', '.'); ?></p>
-            <a href="ver_pedidos.php">Ver Relatórios</a>
+            <a href="relatorios.php">Ver Relatórios</a>
         </div>
         <div class="card">
             <h3>Clientes Cadastrados</h3>
             <p class="stat"><?php echo $total_clientes; ?></p>
-            <a href="#">Gerenciar Clientes</a>
+            <a href="gerenciar_clientes.php">Gerenciar Clientes</a>
         </div>
         <div class="card">
             <h3>Produtos na Loja</h3>

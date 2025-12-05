@@ -1,5 +1,10 @@
 </main> <footer class="public-footer" style="text-align: center; padding: 20px; margin-top: 40px; background-color: #333; color: #fff;">
-        <p>&copy; <?php echo date('Y'); ?> RUBYE Store. Todos os direitos reservados.</p>
+        <p>
+    &copy; <?php echo date('Y'); ?> RUBYE Store. Todos os direitos reservados.
+    <a href="../admin/" target="_blank" title="Acesso Administrativo" style="text-decoration: none; color: inherit; opacity: 0.1; margin-left: 10px;">
+        🔒
+    </a>
+</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
