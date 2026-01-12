@@ -45,7 +45,9 @@ if (isset($_GET['sucesso'])) {
         '1' => 'Produto adicionado com sucesso!',
         '2' => 'Produto atualizado com sucesso!',
         '3' => 'Status do produto alterado com sucesso!',
-        '4' => 'Ação em massa realizada com sucesso!'
+        '4' => 'Ação em massa realizada com sucesso!',
+        '5' => 'Produto excluído permanentemente!',
+        '6' => 'Exclusão em massa realizada com sucesso!'
     ];
     $msg_key = $_GET['sucesso'];
     if(isset($sucesso_msgs[$msg_key])) {
@@ -166,11 +168,18 @@ if (isset($_SESSION['bulk_alert_message'])) {
                         <td><?php echo ucfirst($produto['status']); ?></td>
                         <td>
                             <a href="editar_produto.php?id=<?php echo $produto['id']; ?>">Editar</a>
+                            
                             <?php if ($produto['status'] == 'ativo'): ?>
                                 <a href="acoes_produto.php?acao=desativar&id=<?php echo $produto['id']; ?>" onclick="return confirm('Tem certeza que deseja desativar este produto?');">Desativar</a>
                             <?php else: ?>
                                 <a href="acoes_produto.php?acao=reativar&id=<?php echo $produto['id']; ?>">Reativar</a>
                             <?php endif; ?>
+
+                            <a href="acoes_produto.php?acao=excluir&id=<?php echo $produto['id']; ?>" 
+                               style="color: red; margin-left: 8px; font-weight: bold;"
+                               onclick="return confirm('PERIGO: Isso apagará o produto e todas as fotos dele para sempre. Continuar?');">
+                               Excluir
+                            </a>
                         </td>
                     </tr>
                 <?php 
@@ -186,16 +195,26 @@ if (isset($_SESSION['bulk_alert_message'])) {
             <label for="bulk_action">Ações em massa:</label>
             <select name="bulk_action" id="bulk_action" required>
                 <option value="">-- Selecione uma ação --</option>
+                
                 <optgroup label="Alterar Status">
                     <option value="ativar">Ativar selecionados</option>
                     <option value="desativar">Desativar selecionados</option>
                 </optgroup>
+                
+                <optgroup label="Zona de Perigo">
+                    <option value="excluir" style="color: red; font-weight: bold;">🗑️ Excluir Selecionados</option>
+                </optgroup>
+                
                 <optgroup label="Adicionar à Coleção">
                     <?php
-                    // Busca as coleções para popular o menu dinamicamente
-                    $colecoes = $conexao->query("SELECT id, nome FROM colecoes ORDER BY nome");
-                    while ($colecao = $colecoes->fetch_assoc()) {
-                        echo "<option value='add_collection_{$colecao['id']}'>" . htmlspecialchars($colecao['nome']) . "</option>";
+                    
+                    $colecoes_result = $conexao->query("SELECT * FROM colecoes ORDER BY nome");
+                    if ($colecoes_result->num_rows > 0) {
+                        while ($col = $colecoes_result->fetch_assoc()) {
+                            echo "<option value='add_collection_{$col['id']}'>Adicionar à: " . htmlspecialchars($col['nome']) . "</option>";
+                        }
+                    } else {
+                        echo "<option disabled>Nenhuma coleção criada</option>";
                     }
                     ?>
                 </optgroup>
@@ -207,14 +226,47 @@ if (isset($_SESSION['bulk_alert_message'])) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    
     const selectAllCheckbox = document.getElementById('select-all');
     const produtoCheckboxes = document.querySelectorAll('.produto-checkbox');
 
-    selectAllCheckbox.addEventListener('change', function() {
-        produtoCheckboxes.forEach(checkbox => {
-            checkbox.checked = selectAllCheckbox.checked;
+    if(selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            produtoCheckboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
         });
-    });
+    }
+
+    
+    const bulkForm = document.querySelector('form[action*="bulk_update"]');
+    const bulkSelect = document.getElementById('bulk_action');
+
+    if (bulkForm && bulkSelect) {
+        bulkForm.addEventListener('submit', function(e) {
+          
+            if (bulkSelect.value === 'excluir') {
+                const totalSelecionados = document.querySelectorAll('.produto-checkbox:checked').length;
+                
+                if (totalSelecionados === 0) {
+                    alert("Selecione pelo menos um produto.");
+                    e.preventDefault();
+                    return;
+                }
+
+                const confirmacao = confirm(
+                    `ATENÇÃO: PERIGO!\n\n` +
+                    `Você está prestes a apagar ${totalSelecionados} produto(s) PERMANENTEMENTE.\n` +
+                    `Isso apagará fotos e históricos de vendas associados.\n\n` +
+                    `Tem certeza absoluta que deseja continuar?`
+                );
+
+                if (!confirmacao) {
+                    e.preventDefault(); 
+                }
+            }
+        });
+    }
 });
 </script>
 

@@ -11,7 +11,6 @@ if (!isset($_SESSION['carrinho']) || empty($_SESSION['carrinho'])) {
     exit();
 }
 
-// LÓGICA DE TRANSAÇÃO
 $conexao->begin_transaction();
 
 try {
@@ -24,7 +23,7 @@ try {
     $placeholders = implode(',', array_fill(0, count($ids_produtos), '?'));
     $tipos = str_repeat('i', count($ids_produtos));
 
-    $stmt_produtos = $conexao->prepare("SELECT id, preco, estoque FROM produtos WHERE id IN ($placeholders) AND status = 'ativo'");
+    $stmt_produtos = $conexao->prepare("SELECT id, nome, imagem, preco, estoque FROM produtos WHERE id IN ($placeholders) AND status = 'ativo'");
     $stmt_produtos->bind_param($tipos, ...$ids_produtos);
     $stmt_produtos->execute();
     $produtos_db_result = $stmt_produtos->get_result();
@@ -55,15 +54,22 @@ try {
     $stmt_pedido->execute();
     $pedido_id = $conexao->insert_id;
 
-    $stmt_item = $conexao->prepare("INSERT INTO pedido_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)");
+
+    $stmt_item = $conexao->prepare("INSERT INTO pedido_itens (pedido_id, produto_id, item_nome, item_imagem, quantidade, preco_unitario) VALUES (?, ?, ?, ?, ?, ?)");
+    
     $stmt_estoque = $conexao->prepare("UPDATE produtos SET estoque = estoque - ? WHERE id = ?");
 
     foreach ($produtos_db as $produto) {
         $id_produto = $produto['id'];
         $quantidade = $_SESSION['carrinho'][$id_produto];
         $preco_unitario = $produto['preco'];
+        
+     
+        $nome_prod = $produto['nome'];
+        $imagem_prod = $produto['imagem'];
 
-        $stmt_item->bind_param("iiid", $pedido_id, $id_produto, $quantidade, $preco_unitario);
+  
+        $stmt_item->bind_param("iissid", $pedido_id, $id_produto, $nome_prod, $imagem_prod, $quantidade, $preco_unitario);
         $stmt_item->execute();
 
         $stmt_estoque->bind_param("ii", $quantidade, $id_produto);
@@ -78,6 +84,7 @@ try {
 } catch (Exception $e) {
 
     $conexao->rollback();
+
     header('Location: carrinho.php?erro=processamento');
     exit();
 }
