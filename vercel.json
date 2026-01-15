@@ -1,0 +1,21 @@
+{
+    "functions": {
+        "**/*.php": {
+            "runtime": "vercel-php@0.6.0"
+        }
+    },
+    "routes": [
+        { 
+            "src": "/assets/(.*)", 
+            "dest": "/assets/$1" 
+        },
+        { 
+            "src": "/admin/(.*)", 
+            "dest": "/admin/$1" 
+        },
+        { 
+            "src": "/(.*)", 
+            "dest": "/public/$1" 
+        }
+    ]
+}
