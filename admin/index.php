@@ -1,5 +1,4 @@
 <?php 
-include 'partials/header.php'; 
 
 require_once __DIR__ . '/../config/db.php';
 
@@ -8,6 +7,9 @@ if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
+
+
+include 'partials/header.php'; 
 
 
 $result_pendentes = $conexao->query("SELECT COUNT(id) AS total FROM pedidos WHERE status IN ('Pedido Recebido', 'Pagamento em Análise')");
@@ -26,7 +28,6 @@ $total_clientes = $result_clientes->fetch_assoc()['total'];
 
 $result_produtos = $conexao->query("SELECT COUNT(id) AS total FROM produtos");
 $total_produtos = $result_produtos->fetch_assoc()['total'];
-
 ?>
 
 <div class="dashboard-page">
@@ -40,17 +41,17 @@ $total_produtos = $result_produtos->fetch_assoc()['total'];
             <a href="ver_pedidos.php">Ver Pedidos</a>
         </div>
         <div class="card">
-            <h3>Faturamento (Pagamentos Confirmados)</h3>
+            <h3>Faturamento</h3>
             <p class="stat">R$ <?php echo number_format($faturamento, 2, ',', '.'); ?></p>
             <a href="relatorios.php">Ver Relatórios</a>
         </div>
         <div class="card">
-            <h3>Clientes Cadastrados</h3>
+            <h3>Clientes</h3>
             <p class="stat"><?php echo $total_clientes; ?></p>
             <a href="gerenciar_clientes.php">Gerenciar Clientes</a>
         </div>
         <div class="card">
-            <h3>Produtos na Loja</h3>
+            <h3>Produtos</h3>
             <p class="stat"><?php echo $total_produtos; ?></p>
             <a href="gerenciar_produtos.php">Ver Produtos</a>
         </div>
