@@ -1,5 +1,6 @@
 <?php 
 include 'partials/header.php'; 
+require_once __DIR__ . '/../config/db.php';
 
 // Lógica de Pesquisa e SQL (Mantida igual)
 $busca = filter_input(INPUT_GET, 'busca', FILTER_SANITIZE_SPECIAL_CHARS);

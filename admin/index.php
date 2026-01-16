@@ -1,6 +1,14 @@
 <?php 
 include 'partials/header.php'; 
 
+require_once __DIR__ . '/../config/db.php';
+
+
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
 
 $result_pendentes = $conexao->query("SELECT COUNT(id) AS total FROM pedidos WHERE status IN ('Pedido Recebido', 'Pagamento em Análise')");
 $pedidos_pendentes = $result_pendentes->fetch_assoc()['total'];
