@@ -1,5 +1,5 @@
 <?php
-require_once '../config/db.php';
+require_once '/../config/db.php';
 
 
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_role'] !== 'admin') {
