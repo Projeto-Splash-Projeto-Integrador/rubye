@@ -1,5 +1,4 @@
 <?php
-
 require_once __DIR__ . '/../config/db.php';
 
 if ($_SERVER["REQUEST_METHOD"] != "POST") {
@@ -29,15 +28,18 @@ if ($usuario['role'] !== 'admin') {
 
 if (password_verify($senha_digitada, $usuario['senha'])) {
     
+  
     session_regenerate_id(true); 
+    
     $_SESSION['usuario_id'] = $usuario['id'];
     $_SESSION['usuario_nome'] = $usuario['nome'];
     $_SESSION['usuario_role'] = $usuario['role'];
+
+    session_write_close(); 
     
     header("Location: index.php"); 
     exit();
 } else {
-   
     header("Location: login.php?erro=1");
     exit();
 }
