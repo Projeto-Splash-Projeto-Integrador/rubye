@@ -9,7 +9,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 
-include 'partials/header.php'; 
+include 'partials/header.php';
 
 
 $result_pendentes = $conexao->query("SELECT COUNT(id) AS total FROM pedidos WHERE status IN ('Pedido Recebido', 'Pagamento em Análise')");
